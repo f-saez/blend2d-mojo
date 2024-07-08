@@ -1,0 +1,5 @@
+leaks.sh
+*.so
+test.mojo
+.vscode/
+

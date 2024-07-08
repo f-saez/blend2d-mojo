@@ -197,7 +197,7 @@ struct BLImage:
         self._data = BLImageData()
         var res = self._b2d._handle.get_function[blImageGetData]("blImageGetData")(UnsafePointer(core), UnsafePointer(self._data))
         if res!=BL_SUCCESS:
-            # it falis, I don't know why but it could means the data retreived is garbage so.
+            # if it fails, I don't know why but it could means the data retreived is garbage so.
             self._data = BLImageData()
 
 

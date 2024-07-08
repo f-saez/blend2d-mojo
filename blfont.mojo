@@ -598,14 +598,14 @@ struct BLFont:
     @always_inline
     fn apply_kerning(self, glyphs_buffer : BLGlyphBuffer) -> BLResult:
         """
-         always crashes but the only documentation is the name of the function.
+         always crashes but I will dive into that later.
         """
         return self._b2d._handle.get_function[blFontApplyKerning]("blFontApplyKerning")(self.ptr_core(), glyphs_buffer.ptr_core())  
 
     @always_inline
     fn position_glyphs(self, glyphs_buffer : BLGlyphBuffer) -> BLResult:
         """
-         the only documentation is the name of the function. Don't when to use or even if I need to use it.
+         the only documentation is the name of the function. Don't when to use or even if I need to use it. TODO : check the source code to find more info.
         """
         return self._b2d._handle.get_function[blFontPositionGlyphs]("blFontPositionGlyphs")(self.ptr_core(), glyphs_buffer.ptr_core())  
 

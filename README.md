@@ -1,10 +1,10 @@
-# blend2D-mojo
+# Blend2D-mojo
 
 Blend2D bindings for Mojo. It's a work in progress.
 I'll try to follow the spirit of the C++ version as much as possible.
 
 
-## what is if Blend2D ?
+## what is Blend2D ?
 
 https://blend2d.com/
 

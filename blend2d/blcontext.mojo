@@ -1,11 +1,12 @@
-from blcommon import *
-from blerrorcode import *
-from blimage import BLImage, BLImageCore
-from blpath import BLPath, BLPathCore
-from blfont import BLFont, BLFontCore, BLGlyphBuffer, BLGlyphRun
-from blmatrix2d import *
+from .blcommon import *
+from .blerrorcode import *
+from .blimage import BLImage, BLImageCore
+from .blpath import BLPath, BLPathCore
+from .blfont import BLFont, BLFontCore, BLGlyphBuffer, BLGlyphRun
+from .blmatrix2d import *
+from .blcolor import BLRgba32
 
-from bllibblend2d import LibBlend2D
+from .bllibblend2d import LibBlend2D
 
 alias BL_CONTEXT_CREATE_NO_FLAGS: UInt32 = 0
 alias BL_CONTEXT_CREATE_FLAG_DISABLE_JIT: UInt32 = 1

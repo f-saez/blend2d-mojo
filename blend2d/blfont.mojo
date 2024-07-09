@@ -1,12 +1,13 @@
-from blcommon import *
-from blerrorcode import *
+from .blcommon import *
+from .blerrorcode import *
 from pathlib import Path
-from bllibblend2d import LibBlend2D
+from .bllibblend2d import LibBlend2D
 from testing import assert_equal, assert_true, assert_almost_equal, assert_false
-from blimage import BLImage, BLFormat, BLFileFormat
-from blpath import BLPath, BLPathCore
-from blmatrix2d import BLMatrix2D
-from helpers import string_to_ffi
+from .blimage import BLImage, BLFormat, BLFileFormat
+from .blpath import BLPath, BLPathCore
+from .blmatrix2d import BLMatrix2D
+from .blcolor import BLRgba32
+from .helpers import string_to_ffi
 import os
 
 # text is harder than most people think

@@ -1,7 +1,7 @@
 import sys.ffi
 from memory import UnsafePointer
-from bllibblend2d import LibBlend2D
-from blerrorcode import *
+from .bllibblend2d import LibBlend2D
+from .blerrorcode import *
 from testing import assert_equal, assert_true
 from memory import Arc
 from collections import OptionalReg

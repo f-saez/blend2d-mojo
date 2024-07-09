@@ -11,7 +11,7 @@ import os
 from collections import Optional
 from memory import Arc
 
-import blruntime
+import .blruntime
 
 alias LIBJPEG_NAME = "libblend2d.so"
 

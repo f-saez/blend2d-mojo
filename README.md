@@ -1,24 +1,36 @@
 # blend2D-mojo
+
 Blend2D bindings for Mojo. It's a work in progress.
 I'll try to follow the spirit of the C++ version as much as possible.
 
 
-For more info on Blend2D : 
+## what is if Blend2D ?
 
 https://blend2d.com/
 
 https://github.com/blend2d/blend2d
 
+## why Blend2D ?
+It is small, easy to use and it's API is stable.
 
+Qt is far more than a 2D library.
+
+Skia is complex to build and its API change frequently.
+
+Bonus : it is fast.
+https://blend2d.com/performance.html
+
+## how to install it ?
 To use this, you will need to build Blend2D by yourself.
 
 Don't worry, it's easy :
 https://blend2d.com/doc/build-instructions.html
 
-You'll just have to put the .so file either in your library path, or in your application's directory.
+You'll just have to put the .so file in your library path, or in your application's directory.
+
 In the future, I will use static linking to ease deployment.
 
-
+## What can we do with that ?
 For now, there is only 3 objects :
 
 - BLFont to draw text/glyphs
@@ -27,12 +39,15 @@ For now, there is only 3 objects :
 
 - BLImage to manage bitmaps.
 
-Only three file format : JPEG, PNG, QOI
+Only three file formats to load and save : JPEG, PNG, QOI
 
-In each of these file, you will find a static method named validation.
-It's a function that run some tests to check everything's okay and it describes how it works, how to use it.
+If you haven't heard of QOI : https://qoiformat.org/
 
-to run all the tests for all the objects, simple execute :
-```
-mojo blvalidation.mojo
-```
+There are more things to come obviously (Geometry, textures,, clipping, mask, ...) :-)
+
+## How am I suppose to use this ?
+
+Execute the file run_examples.sh and look at the files in examples.
+These are basic examples, with some comments on how it works. 
+It should gives you a rough idea on how things works.
+I will add a tutorial for each new feature, don't worry.

@@ -1,7 +1,7 @@
-from blerrorcode import *
-from blcommon import *
+from .blerrorcode import *
+from .blcommon import *
 from testing import assert_equal, assert_true
-from bllibblend2d import LibBlend2D
+from .bllibblend2d import LibBlend2D
 
 alias BL_IMAGE_CODEC_NO_FEATURES: UInt32 = 0	# No features.
 alias BL_IMAGE_CODEC_FEATURE_READ: UInt32 = 1	# Image codec supports reading images (can create BLImageDecoder).
@@ -119,6 +119,3 @@ struct BLImageCodec:
         _ = self._b2d._handle.get_function[blImageCodecDestroy]("blImageCodecDestroy")(UnsafePointer(self._core))
         self._b2d.close()
 
-fn main() raises:
-    var text = String("jpeg")
-    var l = len(text)

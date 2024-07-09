@@ -1,7 +1,8 @@
-from blcommon import *
-from blerrorcode import *
-from bllibblend2d import LibBlend2D
-from blimage import BLImage, BLFormat, BLStrokeCap, BLFileFormat
+from .blcommon import *
+from .blerrorcode import *
+from .bllibblend2d import LibBlend2D
+from .blimage import BLImage, BLFormat, BLStrokeCap, BLFileFormat
+from .blcolor import BLRgba32
 from pathlib import Path
 import os
 

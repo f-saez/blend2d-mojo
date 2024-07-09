@@ -1,13 +1,14 @@
-from blerrorcode import *
-from blcommon import *
-from blcontext import BLContext, BLStrokeCap
-from blpath import BLPath
-from bllibblend2d import LibBlend2D
+from .blerrorcode import *
+from .blcommon import *
+from .blcontext import BLContext, BLStrokeCap
+from .blpath import BLPath
+from .bllibblend2d import LibBlend2D
 from pathlib import Path
 from testing import assert_equal, assert_true
 import os
-from helpers import create_path_if_not_exists, set_extension, string_to_ffi
-from blcodec import BLArrayCore
+from .helpers import create_path_if_not_exists, set_extension, string_to_ffi
+from .blcodec import BLArrayCore
+from .blcolor import BLRgba32
 
 alias BLFormat_BL_FORMAT_NONE: UInt32   = 0
 alias BLFormat_BL_FORMAT_PRGB32: UInt32 = 1  # pre-multiplied

@@ -10,10 +10,18 @@ from testing import assert_equal, assert_true
 import os 
 from collections import Optional
 from memory import Arc
+from sys import os_is_macos
 
 import .blruntime
 
-alias LIBJPEG_NAME = "libblend2d.so"
+alias LIBJPEG_NAME = get_libname()
+
+fn get_libname() -> StringLiteral:
+    @parameter
+    if os_is_macos():
+        return "libblend2d.dylib"
+    else:
+        return "libblend2d.so"
 
 @value
 struct LibBlend2D:

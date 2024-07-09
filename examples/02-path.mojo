@@ -5,7 +5,7 @@ from blend2d.blerrorcode import BL_SUCCESS
 from pathlib import Path
 
 
-fn main() raises:
+def main():
     # we had fun (I hope) with rectangles, 
     # but we can draw something more complex.
     # I will focus only on the Path part

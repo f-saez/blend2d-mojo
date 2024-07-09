@@ -6,7 +6,7 @@ from blend2d.blerrorcode import BL_SUCCESS
 from pathlib import Path
 from testing import assert_false, assert_true
 
-fn main() raises:
+def main():
     # now the hard part of the text.
     # https://en.wikipedia.org/wiki/Character_encoding
     # https://en.wikipedia.org/wiki/Complex_text_layout

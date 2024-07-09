@@ -6,7 +6,7 @@ from blend2d.blerrorcode import BL_SUCCESS
 from pathlib import Path
 
 
-fn main() raises:
+def main():
     # we're gonna start simple. 
     # first we create an 1024x768 image. 
     # we have the choice between :

@@ -4,7 +4,7 @@ from blend2d.blcolor import BLRgba32
 from blend2d.blerrorcode import BL_SUCCESS
 from pathlib import Path
 
-fn main() raises:
+def main():
     # Text is at the same time easy at awfully complicated
     # rendering text is hard (https://faultlore.com/blah/text-hates-you/) and sometimes font contains wrong values
     # we will start with the easy part : 

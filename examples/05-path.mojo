@@ -82,7 +82,7 @@ def build_scene(ctx : BLContext, path1 : BLPath, path2 : BLPath):
         _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)   
     # the coordinates used here are screen coordinates. So if we look
     # at the image, we'll see the 2 points with 2 of them right in the path and 
-    # 1 out of the path
+    # none out of the path
     # so, what's wrong ?
     # here, we test if something hit the path, not if something hit the path 
     # where it is drawn.

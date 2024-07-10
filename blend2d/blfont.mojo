@@ -6,6 +6,7 @@ from testing import assert_equal, assert_true, assert_almost_equal, assert_false
 from .blimage import BLImage, BLFormat, BLFileFormat
 from .blpath import BLPath, BLPathCore
 from .blmatrix2d import BLMatrix2D
+from .blgeometry import BLPoint, BLBox, BLPointI
 from .blcolor import BLRgba32
 from .helpers import string_to_ffi
 import os

@@ -1,4 +1,5 @@
-from blend2d.blimage import BLImage, BLRect, BLFileFormat, BLFormat
+from blend2d.blimage import BLImage, BLFileFormat, BLFormat
+from blend2d.blgeometry import BLRect
 from blend2d.blpath import BLPath, BLPoint, BLStrokeCap
 from blend2d.blcolor import BLRgba32   
 from blend2d.blerrorcode import BL_SUCCESS
@@ -28,10 +29,11 @@ def main():
                 # line_to => draw a line between the current postion and the new position
                 # cubic_to => https://en.wikipedia.org/wiki/Cubic_plane_curve
                 # quad_to =>  https://en.wikipedia.org/wiki/Quadratic_function
+                # there are many others thing a Path can describes but we'll see that later.
                 # it may seem a little bit intimidating at first but that's how the way any font is built
                 # a path can be a comlicated line or a complicated form when it is closed, meaning the 
                 # last point is connected to the first
-                # but let's start simple
+                # let's start simple
 
                 _ = path.move_to(26, 31) # first point will be 26,31
                 _ = path.line_to(52,60)
@@ -99,7 +101,7 @@ def main():
                 # the usual stuff
                 _ = ctx.end()
                 var file_format = BLFileFormat.qoi()
-                var filename = file_format.set_extension( Path("02-path"))
+                var filename = file_format.set_extension( Path("02-basic_path"))
                 _ = img.to_file(filename, file_format)
 
 

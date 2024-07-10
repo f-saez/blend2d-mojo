@@ -5,6 +5,8 @@ from .bllibblend2d import LibBlend2D
 from .blpath import BLPath
 from .blcolor import BLRgba32
 from .blruntime import BLRuntime
+from .blgeometry import BLGeometry
+from .blmatrix2d import BLMatrix2D
 
 from .blerrorcode import *
 from .blcommon import *
@@ -19,3 +21,5 @@ fn validation() raises:
     BLPath.validation()
     BLRgba32.validation()
     blfont.validation()
+    BLGeometry.validation()
+    BLMatrix2D.validation()

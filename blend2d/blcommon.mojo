@@ -10,6 +10,14 @@ alias BL_OBJECT_TYPE_IMAGE_CODEC:UInt32 = 101	# Object is BLImageCodec.
 alias BL_OBJECT_TYPE_IMAGE_DECODER:UInt32 = 102	# Object is BLImageDecoder.
 alias BL_OBJECT_TYPE_IMAGE_ENCODER:UInt32 = 103	# Object is BLImageEncoder. 
 
+alias BL_FILL_RULE_NON_ZERO:UInt32 = 0 	# Non-zero fill-rule.
+alias BL_FILL_RULE_EVEN_ODD:UInt32 = 1 	# Even-odd fill-rule. 
+
+alias BL_HIT_TEST_IN:UInt32 = 0 	 # Fully in.
+alias BL_HIT_TEST_PART:UInt32 = 1 	 # Partially in/out.
+alias BL_HIT_TEST_OUT:UInt32 = 2 	 # Fully out.
+alias BL_HIT_TEST_INVALID:UInt32 = 3 # Hit test failed (invalid argument, NaNs, etc). 
+
 alias blArrayInit = fn(UnsafePointer[BLArrayCore], UInt32) -> BLResult
 
 
@@ -61,120 +69,14 @@ struct BLStringCore:
         self._core = BLObjectDetail()
 
 @value
-struct BLSizeI(Stringable):
-    var w: Int32
-    var h: Int32
+struct BLRange:
+    var start: Int
+    var end: Int
 
     fn __init__(inout self):
-        self.w = 0
-        self.h = 0  
-
-    fn __str__(self) -> String:
-        """
-            just for debuging purpose.
-        """        
-        return String("w: ")+String(self.w)+String(" h: ")+String(self.h)
-
-@value
-struct BLPointI(Stringable):
-    var x: Int32
-    var y: Int32
-
-    fn __init__(inout self):
-        self.x = 0
-        self.y = 0                  
-
-    fn __str__(self) -> String:
-        """
-            just for debuging purpose.
-        """        
-        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)
-
-@value
-struct BLRectI(Stringable):
-    var x: Int32
-    var y: Int32
-    var w: Int32
-    var h: Int32
-
-    fn __init__(inout self):
-        self.x = 0
-        self.y = 0                  
-        self.w = 0
-        self.h = 0                  
-
-    fn __str__(self) -> String:
-        """
-            just for debuging purpose.
-        """
-        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)+String("w: ")+String(self.w)+String(" h: ")+String(self.h)
-
-@value
-struct BLRect(Stringable):
-    var x: Float64
-    var y: Float64
-    var w: Float64
-    var h: Float64
-
-    fn __init__(inout self):
-        self.x = 0
-        self.y = 0                  
-        self.w = 0
-        self.h = 0                  
-
-    fn __str__(self) -> String:
-        """
-            just for debuging purpose.
-        """
-        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)+String("w: ")+String(self.w)+String(" h: ")+String(self.h)
-
-
-
-
-@value
-struct BLBox(Stringable):
-    var x0: Float64
-    var y0: Float64
-    var x1: Float64
-    var y1: Float64
-    
-    fn __init__(inout self):
-        self.x0 = 0
-        self.y0 = 0
-        self.x1 = 0
-        self.y1 = 0
-
-    fn __str__(self) -> String:
-        """
-            just for debuging purpose.
-        """
-        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String("x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)
-
-@value
-struct BLPoint(Stringable):
-    var x: Float64
-    var y: Float64
-    
-    fn __init__(inout self):
-        self.x = 0
-        self.y = 0
-
-    @staticmethod
-    fn new(x : Float64, y : Float64) -> BLPoint:
-        """
-          I frequently use stayic method "new" associated with Optional.
-          here I don't need that but I keep using "new" just for coherence.
-        """
-        return Self(x,y)
+        self.start = 0
+        self.end = 0
         
-
-    fn __str__(self) -> String:
-        """
-            just for debuging purpose.
-        """
-        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)
-
-
 @value
 struct StringList:
     var _value : String

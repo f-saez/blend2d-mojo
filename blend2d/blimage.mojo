@@ -9,10 +9,11 @@ import os
 from .helpers import create_path_if_not_exists, set_extension, string_to_ffi
 from .blcodec import BLArrayCore
 from .blcolor import BLRgba32
+from .blgeometry import BLSizeI, BLRect, BLRectI
 
 alias BLFormat_BL_FORMAT_NONE: UInt32   = 0
-alias BLFormat_BL_FORMAT_PRGB32: UInt32 = 1  # pre-multiplied
-alias BLFormat_BL_FORMAT_XRGB32: UInt32 = 2  # alpha ignore, ie always opaque
+alias BLFormat_BL_FORMAT_PRGB32: UInt32 = 1  # pre-multiplied alpha
+alias BLFormat_BL_FORMAT_XRGB32: UInt32 = 2  # alpha ignored, ie always opaque
 alias BLFormat_BL_FORMAT_A8: UInt32     = 3
 
 alias BLDataAccessFlags_BL_DATA_ACCESS_NO_FLAGS: Int32 = 0
@@ -236,10 +237,18 @@ struct BLImage:
     @always_inline
     fn get_width(self) -> Int32:
         return self._data.size.w
+    
+    @always_inline
+    fn get_width_f64(self) -> Float64:
+        return self._data.size.w.cast[DType.float64]()
 
     @always_inline
     fn get_height(self) -> Int32:
         return self._data.size.h
+
+    @always_inline
+    fn get_height_f64(self) -> Float64:
+        return self._data.size.h.cast[DType.float64]()
 
     @always_inline
     fn get_format(self) -> BLFormat:

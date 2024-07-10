@@ -1,4 +1,5 @@
-from blend2d.blimage import BLImage, BLRect, BLFileFormat, BLFormat, BLPointI, BLPoint
+from blend2d.blimage import BLImage, BLFileFormat, BLFormat
+from blend2d.blgeometry import BLRect, BLPointI, BLPoint
 from blend2d.blfont import BLFontFace,BLFont, BLTextMetrics, BLGlyphBuffer
 from blend2d.blcolor import BLRgba32   
 from blend2d.blpath import BLPath

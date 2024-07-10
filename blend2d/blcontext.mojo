@@ -5,6 +5,7 @@ from .blpath import BLPath, BLPathCore
 from .blfont import BLFont, BLFontCore, BLGlyphBuffer, BLGlyphRun
 from .blmatrix2d import *
 from .blcolor import BLRgba32
+from .blgeometry import *
 
 from .bllibblend2d import LibBlend2D
 

@@ -1,6 +1,6 @@
 
-from blend2d.blimage import BLImage, BLRect, BLFileFormat, BLFormat
-from blend2d.blcommon import BLRectI
+from blend2d.blimage import BLImage,  BLFileFormat, BLFormat
+from blend2d.blgeometry import BLRectI, BLRect
 from blend2d.blcolor import BLRgba32   
 from blend2d.blerrorcode import BL_SUCCESS
 from pathlib import Path

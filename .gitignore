@@ -2,5 +2,5 @@ leaks.sh
 *.so
 test.mojo
 .vscode/
-test_examples/
+temp_examples/
 

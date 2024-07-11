@@ -12,6 +12,7 @@ def main():
     # https://en.wikipedia.org/wiki/Character_encoding
     # https://en.wikipedia.org/wiki/Complex_text_layout
     # https://freetype.org/freetype2/docs/glyphs/glyphs-3.html
+    # and for a more general overview of text : https://behdad.org/text2024/
     # so, a string of character is composed of UTF_8 code-point
     # a font is a dictionnary of code-point associated to glyphs
     # and a glyph is a path describing it with lines, cubic and quadratic functions.

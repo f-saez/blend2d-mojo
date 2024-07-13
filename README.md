@@ -3,7 +3,6 @@
 Blend2D bindings for Mojo. It's a work in progress.
 I'll try to follow the spirit of the C++ version as much as possible.
 
-
 ## what is Blend2D ?
 
 https://blend2d.com/
@@ -31,23 +30,27 @@ You'll just have to put the .so file in your library path, or in your applicatio
 In the future, I will use static linking to ease deployment.
 
 ## What can we do with that ?
-For now, there is only 3 objects :
+For now, there is only 5 objects :
 
 - BLFont to draw text/glyphs
 
 - BLPath to draw paths
 
 - BLImage to manage bitmaps.
+  
+- BLGradient for linear gradients (Conic and radial later)
+
+- BLPattern for using an image as a pattern/texture
 
 Only three file formats to load and save : JPEG, PNG, QOI
 
 If you haven't heard of QOI : https://qoiformat.org/
 
-There are more things to come obviously (Geometry, textures,, clipping, mask, ...) :-)
+There are more things to come obviously (clipping, mask, sprites, ...) :-)
 
 ## How am I suppose to use this ?
 
 Execute the file run_examples.sh and look at the files in examples.
-These are basic examples, with some comments on how it works. 
+These are basic examples, with comments on how it works and how to use it.
 It should gives you a rough idea on how things works.
 I will add a tutorial for each new feature, don't worry.

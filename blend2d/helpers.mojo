@@ -1,8 +1,7 @@
 from pathlib import Path
-from testing import assert_equal,assert_false,assert_true
 import os
 
-alias SEP = "\\"  # obviously, this will probably won't works on Windows. Should add something like if os.is_windows() with the correct value
+alias SEP = "/"  # obviously, this will probably won't works on Windows. Should add something like if os.is_windows() with the correct value
 
 fn set_extension(filename : Path, ext : String) -> Path:
     var t = filename.suffix()
@@ -16,17 +15,6 @@ fn set_extension(filename : Path, ext : String) -> Path:
     else:
         return Path(txt[0:-l]+"."+ext)
 
-fn validation_change_extension() raises:
-    var t = Path("name.txt")
-    assert_equal(Path("name.xz"), set_extension(t,"xz") )
-    t = Path("name")
-    assert_equal(Path("name.xz"), set_extension(t,"xz") )
-    t = Path("name.xz.tgz")
-    assert_equal(Path("name.xz.xz"), set_extension(t,"xz") )
-    t = Path("name.")
-    assert_equal(Path("name.xz"), set_extension(t,"xz") )
-
-
 fn create_path_if_not_exists(filename : Path) raises:
     """
         create missing part of the directory of a file
@@ -35,11 +23,12 @@ fn create_path_if_not_exists(filename : Path) raises:
         .
     """
     var tmp = filename.__str__()
-    var idx = tmp.find(SEP)
+    var idx = tmp.find(SEP,0)
     while idx>0:
         var tmp_path = Path(tmp[0:idx])
         if tmp_path.is_dir() == False:
             os.mkdir(tmp)
+        idx = tmp.find(SEP,idx+1)
 
 fn get_file_path(filename : Path) -> Path:
     """
@@ -53,13 +42,6 @@ fn get_file_path(filename : Path) -> Path:
         return Path(tmp[0:idx])
     else:
         return Path("")
-
-fn validation_get_file_path() raises:
-    var filename = Path("temp/tsts/stuff/filename.txt") 
-    assert_equal(get_file_path(filename), Path("temp/tsts/stuff"))
-    filename = Path("filename.txt") 
-    assert_equal(get_file_path(filename), Path(""))
-
 
 fn random_filename(num_chars : Int) -> String:
     """
@@ -126,6 +108,14 @@ fn string_to_ffi(x : String) -> UnsafePointer[UInt8]:
     ptr[len_str] = 0
     return ptr
 
-fn validation() raises :
-    validation_get_file_path()
-    validation_change_extension()
+fn print_string_ffi(ptr : UnsafePointer[UInt8]):
+    var tmp = List[UInt8]()
+    var adr = 0
+    var end = False
+    while not end:
+        tmp.append(ptr[adr])
+        if ptr[adr]==0:
+            break
+        adr += 1
+    print( String(tmp))
+    

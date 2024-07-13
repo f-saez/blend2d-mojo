@@ -1,0 +1,73 @@
+
+from blend2d.blpattern import *
+from testing import assert_equal, assert_true
+
+def validation():
+    tmp = BLImage.new(1024,1024, BLFormat.prgb32()) # alpha channel required
+    assert_true(tmp)
+    img = tmp.take()
+    aa = img.create_context(2)
+    assert_true(aa)
+    ctx = aa.take()   
+    r = ctx.set_fill_style_colour( BLRgba32.rgb(65,65,65) )
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.fill_all()
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.set_pattern_quality_bilinear()
+    assert_equal(r, BL_SUCCESS)
+    filename = Path("test").joinpath("Fish.qoi")
+    a = BLImage.from_file(filename)
+    assert_true(a)
+    img_fish = a.take()    
+    assert_equal(img_fish.get_width(),512)
+    assert_equal(img_fish.get_height(),224)
+    area = BLRectI(0,0,img_fish.get_width(), img_fish.get_height())
+    b = BLPattern.new(img_fish,area, BLExtendMode.repeat())
+    assert_true(b)
+    pattern = b.take()    
+    r = ctx.set_fill_style_pattern(pattern)
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.fill_rect( BLRectI(50,100, 400, 350))
+    assert_equal(r, BL_SUCCESS)
+    r = pattern.translate(50,500)
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.set_fill_style_pattern(pattern)
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.fill_rect( BLRectI(50,500, 400, 350))
+    assert_equal(r, BL_SUCCESS)
+
+    r = pattern.identity()
+    assert_equal(r, BL_SUCCESS)
+    r = pattern.translate(500,100)
+    assert_equal(r, BL_SUCCESS)
+    r = pattern.scale(0.35, 0.35)
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.set_fill_style_pattern(pattern)
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.fill_rect( BLRectI(500,100, 400, 350))
+    assert_equal(r, BL_SUCCESS)
+        
+    r = pattern.identity()
+    assert_equal(r, BL_SUCCESS)
+    r = pattern.translate(500,500)
+    assert_equal(r, BL_SUCCESS)
+    r = pattern.rotate_point(-0.88, img_fish.get_width_f64()/2, img_fish.get_height_f64()/2)
+    assert_equal(r, BL_SUCCESS)
+    r = pattern.scale(0.65, 0.65)
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.set_fill_style_pattern(pattern)
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.fill_rect( BLRectI(500,500, 400, 350))
+    assert_equal(r, BL_SUCCESS)
+    r = ctx.end()
+    assert_equal(r, BL_SUCCESS)
+    _ = img_fish
+    
+    filename = Path("test").joinpath("patterns_ref.qoi")
+    ab = BLImage.from_file(filename)
+    assert_true(ab)
+    img_ref = a.take() 
+
+    assert_true( img.almost_equal(img_ref, True))
+
+    

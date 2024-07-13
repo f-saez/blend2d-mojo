@@ -91,7 +91,9 @@ alias BL_ERROR_FORCE_UINT:BLResult = -1
 # TODO : complete this with all the error messages
 fn error_code(code : BLResult) -> String:
     var result = String("to be done")
-    if code==BL_ERROR_START_INDEX:
+    if code==BL_SUCCESS:
+        result = String("success") 
+    elif code==BL_ERROR_START_INDEX:
         result = String("start index") 
     elif code==BL_ERROR_OUT_OF_MEMORY:
         result = String("out of memory") 

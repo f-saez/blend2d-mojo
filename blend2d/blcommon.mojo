@@ -1,4 +1,3 @@
-from testing import assert_equal, assert_true
 from .blerrorcode import BLResult
 
 alias BL_FILE_READ_NO_FLAGS:UInt32 = 0
@@ -17,6 +16,90 @@ alias BL_HIT_TEST_IN:UInt32 = 0 	 # Fully in.
 alias BL_HIT_TEST_PART:UInt32 = 1 	 # Partially in/out.
 alias BL_HIT_TEST_OUT:UInt32 = 2 	 # Fully out.
 alias BL_HIT_TEST_INVALID:UInt32 = 3 # Hit test failed (invalid argument, NaNs, etc). 
+
+alias BL_EXTEND_MODE_PAD:UInt32 = 0 # Pad extend [default].
+alias BL_EXTEND_MODE_REPEAT:UInt32 = 1 # Repeat extend.
+alias BL_EXTEND_MODE_REFLECT:UInt32 = 2 # Reflect extend.
+alias BL_EXTEND_MODE_PAD_X_PAD_Y:UInt32 = 3 # Alias to BL_EXTEND_MODE_PAD.
+alias BL_EXTEND_MODE_PAD_X_REPEAT_Y:UInt32 = 4 # Pad X and repeat Y.
+alias BL_EXTEND_MODE_PAD_X_REFLECT_Y:UInt32 = 5 # Pad X and reflect Y.
+alias BL_EXTEND_MODE_REPEAT_X_REPEAT_Y:UInt32 = 6 # Alias to BL_EXTEND_MODE_REPEAT.
+alias BL_EXTEND_MODE_REPEAT_X_PAD_Y:UInt32 = 7 # Repeat X and pad Y.
+alias BL_EXTEND_MODE_REPEAT_X_REFLECT_Y:UInt32 = 8 # Repeat X and reflect Y.
+alias BL_EXTEND_MODE_REFLECT_X_REFLECT_Y:UInt32 = 9 # Alias to BL_EXTEND_MODE_REFLECT.
+alias BL_EXTEND_MODE_REFLECT_X_PAD_Y:UInt32 = 10 # Reflect X and pad Y.
+alias BL_EXTEND_MODE_REFLECT_X_REPEAT_Y:UInt32 = 11 # Reflect X and repeat Y.
+
+#============================================================================================================
+#
+#          The "enums" part
+#
+#============================================================================================================
+
+@value
+struct BLExtendMode:
+    var value : UInt32
+
+    @staticmethod
+    @always_inline
+    fn pad() -> Self:
+        return Self(BL_EXTEND_MODE_PAD)    
+
+    @staticmethod
+    @always_inline
+    fn repeat() -> Self:
+        return Self(BL_EXTEND_MODE_REPEAT)    
+
+    @staticmethod
+    @always_inline
+    fn reflect() -> Self:
+        return Self(BL_EXTEND_MODE_REFLECT)    
+
+    @staticmethod
+    @always_inline
+    fn pad_x_pad_y() -> Self:
+        return Self(BL_EXTEND_MODE_PAD_X_PAD_Y)    
+
+    @staticmethod
+    @always_inline
+    fn pad_x_repeat_y() -> Self:
+        return Self(BL_EXTEND_MODE_PAD_X_REPEAT_Y)    
+
+    @staticmethod
+    @always_inline
+    fn pad_x_reflect_y() -> Self:
+        return Self(BL_EXTEND_MODE_PAD_X_REFLECT_Y)    
+
+    @staticmethod
+    @always_inline
+    fn repeat_x_repeat_y() -> Self:
+        return Self(BL_EXTEND_MODE_REPEAT_X_REPEAT_Y) 
+
+    @staticmethod
+    @always_inline
+    fn repeat_x_pad_y() -> Self:
+        return Self(BL_EXTEND_MODE_REPEAT_X_PAD_Y) 
+
+    @staticmethod
+    @always_inline
+    fn repeat_x_reflect_y() -> Self:
+        return Self(BL_EXTEND_MODE_REPEAT_X_REFLECT_Y) 
+
+    @staticmethod
+    @always_inline
+    fn reflect_x_reflect_y() -> Self:
+        return Self(BL_EXTEND_MODE_REFLECT_X_REFLECT_Y) 
+
+    @staticmethod
+    @always_inline
+    fn reflect_x_pad_y() -> Self:
+        return Self(BL_EXTEND_MODE_REFLECT_X_PAD_Y) 
+
+    @staticmethod
+    @always_inline
+    fn reflect_x_repeat_y() -> Self:
+        return Self(BL_EXTEND_MODE_REFLECT_X_REPEAT_Y) 
+
 
 alias blArrayInit = fn(UnsafePointer[BLArrayCore], UInt32) -> BLResult
 

@@ -43,7 +43,7 @@ def main():
             _ = ctx.fill_all()
             # this time, it's a multi-line text
             var text = String("Hello Mojo!\nI'm a simple multiline text example\nthat uses GlyphBuffer and GlyphRun!")
-            var filename = Path("../examples").joinpath("ReadexPro-Regular.ttf")  
+            var filename = Path("..").joinpath("examples").joinpath("ReadexPro-Regular.ttf")  
             var aaa = BLFontFace.from_path(filename,0)
             if aaa:
                 var fontface = aaa.take()

@@ -50,11 +50,6 @@ struct LibBlend2D:
             print("Unable to load ",LIBJPEG_NAME)
         return result
     
-    @staticmethod
-    fn validation() raises :
-        var aaa = LibBlend2D.new()
-        assert_true(aaa)
-        var lib = aaa.take()
-        lib.close()
+
         
 

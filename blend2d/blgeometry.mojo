@@ -1,4 +1,3 @@
-from testing import assert_equal
 
 alias BL_FLATTEN_MODE_DEFAULT:UInt32 = 0
 alias BL_OFFSET_MODE_DEFAULT:UInt32 = 0
@@ -124,25 +123,7 @@ struct BLGeometry:
     fn polygonD() -> Self:
         return Self(BL_GEOMETRY_TYPE_POLYGOND)
 
-    @staticmethod
-    fn validation() raises:
-        assert_equal(Self.none().value, BL_GEOMETRY_TYPE_NONE)
-        assert_equal(Self.boxI().value, BL_GEOMETRY_TYPE_BOXI)
-        assert_equal(Self.boxD().value, BL_GEOMETRY_TYPE_BOXD)
-        assert_equal(Self.rectI().value, BL_GEOMETRY_TYPE_RECTI)
-        assert_equal(Self.rectD().value, BL_GEOMETRY_TYPE_RECTD)
-        assert_equal(Self.circle().value, BL_GEOMETRY_TYPE_CIRCLE)
-        assert_equal(Self.elipse().value, BL_GEOMETRY_TYPE_ELLIPSE)
-        assert_equal(Self.round_rect().value, BL_GEOMETRY_TYPE_ROUND_RECT)
-        assert_equal(Self.arc().value, BL_GEOMETRY_TYPE_ARC)
-        assert_equal(Self.chord().value, BL_GEOMETRY_TYPE_CHORD)
-        assert_equal(Self.pie().value, BL_GEOMETRY_TYPE_PIE)
-        assert_equal(Self.line().value, BL_GEOMETRY_TYPE_LINE)
-        assert_equal(Self.triangle().value, BL_GEOMETRY_TYPE_TRIANGLE)
-        assert_equal(Self.polylineI().value, BL_GEOMETRY_TYPE_POLYLINEI)
-        assert_equal(Self.polylineD().value, BL_GEOMETRY_TYPE_POLYLINED)
-        assert_equal(Self.polygonI().value, BL_GEOMETRY_TYPE_POLYGONI)
-        assert_equal(Self.polygonD().value, BL_GEOMETRY_TYPE_POLYGOND)
+
 
 @value
 struct BLGeometryDirection:

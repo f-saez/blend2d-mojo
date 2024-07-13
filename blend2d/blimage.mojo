@@ -4,9 +4,8 @@ from .blcontext import BLContext, BLStrokeCap
 from .blpath import BLPath
 from .bllibblend2d import LibBlend2D
 from pathlib import Path
-from testing import assert_equal, assert_true
 import os
-from .helpers import create_path_if_not_exists, set_extension, string_to_ffi
+from .helpers import create_path_if_not_exists, set_extension, string_to_ffi, print_string_ffi
 from .blcodec import BLArrayCore
 from .blcolor import BLRgba32
 from .blgeometry import BLSizeI, BLRect, BLRectI
@@ -73,9 +72,9 @@ struct BLFormat:
     fn __init__(inout self, value : UInt32):
         self.value = value
         self._bpp = 0
-        if value==BLFormat_BL_FORMAT_PRGB32:
+        if value==BLFormat_BL_FORMAT_PRGB32: # pre-multiplied alpha
             self._bpp = 4
-        elif value==BLFormat_BL_FORMAT_XRGB32:
+        elif value==BLFormat_BL_FORMAT_XRGB32:# alpha ignored, ie always opaque
             self._bpp = 4
         elif value==BLFormat_BL_FORMAT_A8:            
             self._bpp = 1
@@ -197,11 +196,7 @@ struct BLImage:
         self._b2d = b2d
         self._core = core
         self._data = BLImageData()
-        var res = self._b2d._handle.get_function[blImageGetData]("blImageGetData")(UnsafePointer(core), UnsafePointer(self._data))
-        if res!=BL_SUCCESS:
-            # if it fails, I don't know why but it could means the data retreived is garbage so.
-            self._data = BLImageData()
-
+        _ = self.refresh_data()
 
     fn __del__(owned self):
         # I'm not sure in what order the destructor destroy his objects
@@ -252,7 +247,7 @@ struct BLImage:
 
     @always_inline
     fn get_format(self) -> BLFormat:
-        return self._data.format
+        return BLFormat(self._data.format)
 
     @always_inline
     fn get_stride(self) -> Int:
@@ -263,24 +258,28 @@ struct BLImage:
         return UnsafePointer[BLImageCore](self._core)
 
     fn reset(self) -> BLResult:
-        return self._b2d._handle.get_function[blImageReset]("blImageReset")(UnsafePointer(self._core))
+        return self._b2d._handle.get_function[blImageReset]("blImageReset")(self.get_core_ptr())
 
     fn image_info(self) -> BLResult:
-        return self._b2d._handle.get_function[blImageReset]("blImageReset")(UnsafePointer(self._core))
+        return self._b2d._handle.get_function[blImageReset]("blImageReset")(self.get_core_ptr())
 
-    fn get_data(self) -> Optional[BLImageData]:
+    fn refresh_data(inout self) -> BLResult:
         """
             return some data on the image. It's very light, it just copy some internal stuff to
             a struct.
         """
-        var data = BLImageData()
-        var result = Optional[BLImageData](None)
-        var res = self._b2d._handle.get_function[blImageGetData]("blImageGetData")(UnsafePointer(self._core), UnsafePointer(data))
-        if res==BL_SUCCESS:
-            result = Optional[BLImageData](data)
-        else:
-            print(error_code(res))
-        return result
+        var res = self._b2d._handle.get_function[blImageGetData]("blImageGetData")(self.get_core_ptr(), UnsafePointer(self._data))
+        if res!=BL_SUCCESS:
+            # if it fails - I don't know why it could fail - but it could means the data retreived is garbage so.
+            self._data = BLImageData()
+        return res
+    
+    fn get_data(self) -> BLImageData:
+        """
+            return some data on the image. It's very light, it just copy some internal stuff to
+            a struct.
+        """
+        return self._data
 
     fn almost_equal(self, other :BLImage, rgba : Bool) -> Bool:
         """
@@ -297,40 +296,36 @@ struct BLImage:
         var num_pixels = w*h
         var num_diff = 0
         if w==other.get_width() and h==other.get_height() and self.get_stride()==other.get_stride():
-            var aaa = self.get_data()
-            if aaa:
-                var aab = other.get_data()
-                if aab:
-                    var data1 = aaa.take()
-                    var data2 = aab.take()
-                    # a dumb way to do that, but who cares ?
-                    for y in range(h):
-                        var idx = y*self.get_stride()
-                        for x in range(w):
-                            var delta = abs(data1.pixels[idx].cast[DType.int32]() - data2.pixels[idx].cast[DType.int32]())
-                            if delta>=10:
+            var data1 = self.get_data()
+            var data2 = other.get_data()
+            # a dumb way to do that, but who cares ?
+            for y in range(h):
+                var idx = y*self.get_stride()
+                for x in range(w):
+                    var delta = abs(data1.pixels[idx].cast[DType.int32]() - data2.pixels[idx].cast[DType.int32]())
+                    if delta>=10:
+                        num_diff += 1
+                    else:
+                        delta = abs(data1.pixels[idx+1].cast[DType.int32]() - data2.pixels[idx+1].cast[DType.int32]())
+                        if delta>10:
+                            num_diff += 1
+                        else:                                    
+                            delta = abs(data1.pixels[idx+2].cast[DType.int32]() - data2.pixels[idx+2].cast[DType.int32]())                            
+                            if delta>10:
                                 num_diff += 1
-                            else:
-                                delta = abs(data1.pixels[idx+1].cast[DType.int32]() - data2.pixels[idx+1].cast[DType.int32]())
+                            elif rgba:                                    
+                                delta = abs(data1.pixels[idx+3].cast[DType.int32]() - data2.pixels[idx+3].cast[DType.int32]())                                
                                 if delta>10:
-                                    num_diff += 1
-                                else:                                    
-                                    delta = abs(data1.pixels[idx+2].cast[DType.int32]() - data2.pixels[idx+2].cast[DType.int32]())                            
-                                    if delta>10:
-                                        num_diff += 1
-                                    elif rgba:                                    
-                                        delta = abs(data1.pixels[idx+3].cast[DType.int32]() - data2.pixels[idx+3].cast[DType.int32]())                                
-                                        if delta>10:
-                                            num_diff += 1                                                                            
-                    result = Float32(num_diff) / Float32(num_pixels) <= 0.05
+                                    num_diff += 1                                                                            
+            result = Float32(num_diff) / Float32(num_pixels) <= 0.05
         return result
 
     fn to_file(self, filename : Path, file_format : BLFileFormat) raises -> BLResult:
         create_path_if_not_exists(filename)
         var filename1 = file_format.set_extension(filename).__str__()
-        var ptr = string_to_ffi(filename1)
+        var ptr = filename1.unsafe_uint8_ptr()
         var res = self._b2d._handle.get_function[blImageWriteToFile]("blImageWriteToFile")(self.get_core_ptr(), ptr, UnsafePointer[UInt8]())
-        ptr.free()
+        _ = filename1
         return res
 
     @staticmethod
@@ -338,7 +333,8 @@ struct BLImage:
         """
             Only JPEG, PNG and QOI (https://qoiformat.org/).
         """
-        var filename1 = string_to_ffi(filename.__str__())
+        var filename1 = filename.__str__()
+        var ptr = string_to_ffi(filename1)
         var result = Optional[Self](None)  
         var _b2d = LibBlend2D.new()
         if _b2d: 
@@ -347,89 +343,12 @@ struct BLImage:
             var res = b2d._handle.get_function[blImageInit]("blImageInit")(UnsafePointer(core))
             if res==BL_SUCCESS:
                 var core_ptr = UnsafePointer[BLImageCore](core)
-                var res = b2d._handle.get_function[blImageReadFromFile]("blImageReadFromFile")(core_ptr,filename1, UnsafePointer[UInt8]())
+                var res = b2d._handle.get_function[blImageReadFromFile]("blImageReadFromFile")(core_ptr,ptr, UnsafePointer[UInt8]())
                 if res==BL_SUCCESS:
                     var img = Self(b2d^, core^)
                     result = Optional[Self](img)
             if res!=BL_SUCCESS:
                 print(error_code(res),res)
-        filename1.free()
+        ptr.free()
         return result
 
-    @staticmethod
-    fn validation() raises:
-        var tmp = BLImage.new(1024,768, BLFormat.xrgb32())
-        assert_true(tmp)
-        var img = tmp.take()
-        
-        var aa = img.create_context(2)
-        assert_true(aa)
-        var ctx = aa.take()
-        var r = ctx.set_fill_style_colour( BLRgba32.rgb(215,215,215) )
-        assert_equal(r, BL_SUCCESS)
-        r = ctx.fill_all()
-        assert_equal(r, BL_SUCCESS)
-
-        r = ctx.fill_rect_rgba32(BLRectI(150,150,320,240), BLRgba32.rgb(55,55,55) )
-        assert_equal(r, BL_SUCCESS)
-
-        assert_equal(r, BL_SUCCESS)
-        var rect = BLRect(150,150,320,240)
-        r = ctx.fill_rectd_rgba32(rect, BLRgba32.rgb(55,55,165) )
-        assert_equal(r, BL_SUCCESS)
-        r = ctx.save()
-        assert_equal(r, BL_SUCCESS)
-        r = ctx.identity()
-        assert_equal(r, BL_SUCCESS)
-        r = ctx.rotate_pt(0.1, rect.x+rect.w/2, rect.y+rect.h/2)
-        assert_equal(r, BL_SUCCESS)  
-        r = ctx.stroke_rectd_rgba32(rect, BLRgba32.rgb(165,55,55) )
-        assert_equal(r, BL_SUCCESS)
-
-        r = ctx.restore()
-        assert_equal(r, BL_SUCCESS)
-        
-        var file_format = BLFileFormat.qoi()
-        var filename = file_format.set_extension( Path("test").joinpath("image"))
-        r = img.to_file(filename, file_format)
-        assert_equal(r, BL_SUCCESS)
-
-        var aaa = BLImage.from_file(Path("test").joinpath("image_ref.qoi"))
-        assert_true(aaa)
-        var img_ref = aaa.take()
-        assert_true(img_ref.almost_equal(img, True))
-
-        os.path.path.remove(filename)
-
-    @staticmethod
-    fn validation_codecs() raises:
-        var filename = Path("test").joinpath("logo_mojo.qoi")
-        var r = BLImage.from_file(filename)
-        assert_true(r)
-        var img = r.take()
-        assert_equal(img.get_width(), 314)
-        assert_equal(img.get_height(), 471)
-        assert_equal(img.get_format().value, BLFormat.prgb32().value)
-
-        filename = Path("test").joinpath("logo_mojo.jpg")
-        r = BLImage.from_file(filename)
-        assert_true(r)
-        var img1 = r.take()
-        assert_equal(img1.get_width(), 314)
-        assert_equal(img1.get_height(), 471)
-        assert_equal(img1.get_format().value, BLFormat.xrgb32().value)
-        assert_true(img.almost_equal(img1, False))
-
-        var filename2 = Path("test").joinpath("logo_mojo.png")
-        r = BLImage.from_file(filename2)
-        assert_true(r)
-        var img2 = r.take()
-        assert_equal(img2.get_width(), 314)
-        assert_equal(img2.get_height(), 471)
-        assert_equal(img2.get_format().value, BLFormat.prgb32().value)  
-        assert_true(img.almost_equal(img2, False))
-                             
-
-fn validation() raises:
-    BLImage.validation()
-    BLImage.validation_codecs()

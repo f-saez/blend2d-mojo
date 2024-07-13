@@ -21,7 +21,7 @@ def main():
             # first, let's load a font
             # regular means vanilla, i.e. not bold, not italic, no light, ...
             # but this is not true anymore with variable fonts.
-            var filename = Path("../examples").joinpath("ReadexPro-Regular.ttf")   
+            var filename = Path("..").joinpath("examples").joinpath("ReadexPro-Regular.ttf")   
             var aaa = BLFontFace.from_path(filename,0)
             if aaa:
                 var fontface = aaa.take()

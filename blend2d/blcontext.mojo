@@ -4,9 +4,9 @@ from .blimage import BLImage, BLImageCore
 from .blpath import BLPath, BLPathCore
 from .blfont import BLFont, BLFontCore, BLGlyphBuffer, BLGlyphRun
 from .blmatrix2d import *
-from .blcolor import BLRgba32
+from .blcolor import BLRgba32, BLGradient
 from .blgeometry import *
-
+from .blpattern import BLPattern, BLPatternCore
 from .bllibblend2d import LibBlend2D
 
 alias BL_CONTEXT_CREATE_NO_FLAGS: UInt32 = 0
@@ -17,35 +17,42 @@ alias BL_CONTEXT_CREATE_FLAG_ISOLATED_JIT_RUNTIMEL: UInt32 = 33554432
 alias BL_CONTEXT_CREATE_FLAG_ISOLATED_JIT_LOGGING: UInt32 = 67108864
 alias BL_CONTEXT_CREATE_FLAG_OVERRIDE_CPU_FEATURES: UInt32 = 134217728
 
-alias BL_COMP_OP_SRC_OVER: UInt32 = 0
-alias BL_COMP_OP_SRC_COPY: UInt32 = 1
-alias BL_COMP_OP_SRC_IN: UInt32 = 2
-alias BL_COMP_OP_SRC_OUT: UInt32 = 3
-alias BL_COMP_OP_SRC_ATOP: UInt32 = 4
-alias BL_COMP_OP_DST_OVER: UInt32 = 5
-alias BL_COMP_OP_DST_COPY: UInt32 = 6
-alias BL_COMP_OP_DST_IN: UInt32 = 7
-alias BL_COMP_OP_DST_OUT: UInt32 = 8
-alias BL_COMP_OP_DST_ATOP: UInt32 = 9
-alias BL_COMP_OP_XOR: UInt32 = 10
-alias BL_COMP_OP_CLEAR: UInt32 = 11
-alias BL_COMP_OP_PLUS: UInt32 = 12
-alias BL_COMP_OP_MINUS: UInt32 = 13
-alias BL_COMP_OP_MODULATE: UInt32 = 14 
-alias BL_COMP_OP_MULTIPLY: UInt32 = 15
-alias BL_COMP_OP_SCREEN: UInt32 = 16
-alias BL_COMP_OP_OVERLAY: UInt32 = 17
-alias BL_COMP_OP_DARKEN: UInt32 = 18
-alias BL_COMP_OP_LIGHTEN: UInt32 = 19
-alias BL_COMP_OP_COLOR_DODGE: UInt32 = 20
-alias BL_COMP_OP_COLOR_BURN: UInt32 = 21
-alias BL_COMP_OP_LINEAR_BURN: UInt32 = 22
-alias BL_COMP_OP_LINEAR_LIGHT: UInt32 = 23
-alias BL_COMP_OP_PIN_LIGHT: UInt32 = 24
-alias BL_COMP_OP_HARD_LIGHT: UInt32 = 25
-alias BL_COMP_OP_SOFT_LIGHT: UInt32 = 26
-alias BL_COMP_OP_DIFFERENCE: UInt32 = 27
-alias BL_COMP_OP_EXCLUSION: UInt32 = 28
+alias BL_CONTEXT_HINT_RENDERING_QUALITY: UInt32 = 0 # Rendering quality.
+alias BL_CONTEXT_HINT_GRADIENT_QUALITY: UInt32 = 1 	# Gradient quality.
+alias BL_CONTEXT_HINT_PATTERN_QUALITY: UInt32 = 2 	# Pattern quality. 
+
+alias BL_PATTERN_QUALITY_NEAREST:UInt32 = 0 # Nearest neighbor interpolation.
+alias BL_PATTERN_QUALITY_BILINEAR:UInt32 = 1 # Bilinear interpolation. 
+
+alias BL_COMP_OP_SRC_OVER:UInt32 = 0 # Source-over [default].
+alias BL_COMP_OP_SRC_COPY:UInt32 = 1 # Source-copy.
+alias BL_COMP_OP_SRC_IN:UInt32 = 2 # Source-in.
+alias BL_COMP_OP_SRC_OUT:UInt32 = 3 # Source-out.
+alias BL_COMP_OP_SRC_ATOP:UInt32 = 4 # Source-atop.
+alias BL_COMP_OP_DST_OVER:UInt32 = 5 # Destination-over.
+alias BL_COMP_OP_DST_COPY:UInt32 = 6 # Destination-copy [nop].
+alias BL_COMP_OP_DST_IN:UInt32 = 7 # Destination-in.
+alias BL_COMP_OP_DST_OUT:UInt32 = 8 # Destination-out.
+alias BL_COMP_OP_DST_ATOP:UInt32 = 9 # Destination-atop.
+alias BL_COMP_OP_XOR:UInt32 = 10 # Xor.
+alias BL_COMP_OP_CLEAR:UInt32 = 11 # Clear.
+alias BL_COMP_OP_PLUS:UInt32 = 12 # Plus.
+alias BL_COMP_OP_MINUS:UInt32 = 13 # Minus.
+alias BL_COMP_OP_MODULATE:UInt32 = 14 # Modulate.
+alias BL_COMP_OP_MULTIPLY:UInt32 = 15 # Multiply.
+alias BL_COMP_OP_SCREEN:UInt32 = 16 # Screen.
+alias BL_COMP_OP_OVERLAY:UInt32 = 17 # Overlay.
+alias BL_COMP_OP_DARKEN:UInt32 = 18 # Darken.
+alias BL_COMP_OP_LIGHTEN:UInt32 = 19 # Lighten.
+alias BL_COMP_OP_COLOR_DODGE:UInt32 = 20 # Color dodge.
+alias BL_COMP_OP_COLOR_BURN:UInt32 = 21 # Color burn.
+alias BL_COMP_OP_LINEAR_BURN:UInt32 = 22 # Linear burn.
+alias BL_COMP_OP_LINEAR_LIGHT:UInt32 = 23 # Linear light.
+alias BL_COMP_OP_PIN_LIGHT:UInt32 = 24 # Pin light.
+alias BL_COMP_OP_HARD_LIGHT:UInt32 = 25 # Hard-light.
+alias BL_COMP_OP_SOFT_LIGHT:UInt32 = 26 # Soft-light.
+alias BL_COMP_OP_DIFFERENCE:UInt32 = 27 # Difference.
+alias BL_COMP_OP_EXCLUSION:UInt32 = 28 # Exclusion. 
 
 alias BL_STROKE_CAP_BUTT: UInt32 = 0
 alias BL_STROKE_CAP_SQUARE: UInt32 = 1
@@ -90,9 +97,11 @@ alias blContextFillPathD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoin
 alias blContextFillPathDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLPathCore], UInt32) -> BLResult
 alias blContextFillAll = fn(UnsafePointer[BLContextCore]) -> BLResult
 alias blContextFillAllRgba32 = fn(UnsafePointer[BLContextCore], UInt32) -> BLResult
-alias blContextSetFillStyleRgba32 = fn(UnsafePointer[BLContextCore], UInt32) -> BLResult
 alias blContextFillGlyphRunI = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPointI], UnsafePointer[BLFontCore], UnsafePointer[BLGlyphRun]) -> BLResult
 alias blContextFillGlyphRunIRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPointI], UnsafePointer[BLFontCore], UnsafePointer[BLGlyphRun], UInt32) -> BLResult
+
+alias blContextSetFillStyleRgba32 = fn(UnsafePointer[BLContextCore], UInt32) -> BLResult
+alias blContextSetFillStyle = fn(UnsafePointer[BLContextCore], UnsafePointer[UInt8]) -> BLResult
 
 alias blContextSetStrokeCap = fn(UnsafePointer[BLContextCore], UInt32, UInt32) -> BLResult
 alias blContextSetStrokeCaps = fn(UnsafePointer[BLContextCore], UInt32) -> BLResult
@@ -107,7 +116,7 @@ alias blContextStrokeUtf8TextDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePo
 alias blContextFillUtf8TextD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[UInt8], Int) -> BLResult
 alias blContextFillUtf8TextDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[UInt8], Int, UInt32) -> BLResult
 
-  
+alias blContextSetHint = fn(UnsafePointer[BLContextCore], UInt32, UInt32) -> BLResult
 #============================================================================================================
 #
 #          The "enums" part
@@ -121,142 +130,149 @@ struct BLCompOp:
     @staticmethod
     @always_inline
     fn src_over() -> Self:
-        return Self(BL_COMP_OP_SRC_OVER)
+        return Self(BL_COMP_OP_SRC_OVER)  
 
     @staticmethod
     @always_inline
     fn src_copy() -> Self:
-        return Self(BL_COMP_OP_SRC_COPY)
+        return Self(BL_COMP_OP_SRC_COPY)  
 
     @staticmethod
     @always_inline
     fn src_in() -> Self:
-        return Self(BL_COMP_OP_SRC_IN)
+        return Self(BL_COMP_OP_SRC_IN)  
 
     @staticmethod
     @always_inline
     fn src_out() -> Self:
-        return Self(BL_COMP_OP_SRC_OUT)
+        return Self(BL_COMP_OP_SRC_OUT)  
 
     @staticmethod
     @always_inline
     fn src_atop() -> Self:
-        return Self(BL_COMP_OP_SRC_ATOP)
+        return Self(BL_COMP_OP_SRC_ATOP)  
 
     @staticmethod
     @always_inline
     fn dst_over() -> Self:
-        return Self(BL_COMP_OP_DST_OVER)
+        return Self(BL_COMP_OP_DST_OVER)  
 
     @staticmethod
     @always_inline
     fn dst_copy() -> Self:
-        return Self(BL_COMP_OP_DST_COPY)
+        return Self(BL_COMP_OP_DST_COPY)  
 
     @staticmethod
     @always_inline
     fn dst_in() -> Self:
-        return Self(BL_COMP_OP_DST_IN)
+        return Self(BL_COMP_OP_DST_IN)  
 
     @staticmethod
     @always_inline
     fn dst_out() -> Self:
-        return Self(BL_COMP_OP_DST_OUT)
-
+        return Self(BL_COMP_OP_DST_OUT)  
+    
     @staticmethod
     @always_inline
     fn dst_atop() -> Self:
-        return Self(BL_COMP_OP_DST_ATOP)
+        return Self(BL_COMP_OP_DST_ATOP)  
 
     @staticmethod
     @always_inline
     fn xor() -> Self:
-        return Self(BL_COMP_OP_XOR)
+        return Self(BL_COMP_OP_XOR) 
 
     @staticmethod
     @always_inline
     fn clear() -> Self:
-        return Self(BL_COMP_OP_CLEAR)
+        return Self(BL_COMP_OP_CLEAR) 
 
     @staticmethod
     @always_inline
     fn plus() -> Self:
-        return Self(BL_COMP_OP_PLUS)
+        return Self(BL_COMP_OP_PLUS) 
 
     @staticmethod
     @always_inline
     fn minus() -> Self:
-        return Self(BL_COMP_OP_MINUS)
+        return Self(BL_COMP_OP_MINUS) 
 
     @staticmethod
     @always_inline
     fn modulate() -> Self:
-        return Self(BL_COMP_OP_MODULATE)
+        return Self(BL_COMP_OP_MODULATE) 
 
     @staticmethod
     @always_inline
     fn multiply() -> Self:
-        return Self(BL_COMP_OP_MULTIPLY)
+        return Self(BL_COMP_OP_MULTIPLY) 
 
     @staticmethod
     @always_inline
     fn screen() -> Self:
-        return Self(BL_COMP_OP_SCREEN)
+        return Self(BL_COMP_OP_SCREEN) 
 
     @staticmethod
     @always_inline
     fn overlay() -> Self:
-        return Self(BL_COMP_OP_OVERLAY)
+        return Self(BL_COMP_OP_OVERLAY) 
 
     @staticmethod
     @always_inline
     fn darken() -> Self:
-        return Self(BL_COMP_OP_DARKEN)
+        return Self(BL_COMP_OP_DARKEN) 
 
     @staticmethod
     @always_inline
     fn lighten() -> Self:
-        return Self(BL_COMP_OP_LIGHTEN)
+        return Self(BL_COMP_OP_LIGHTEN) 
 
     @staticmethod
     @always_inline
     fn color_dodge() -> Self:
-        return Self(BL_COMP_OP_COLOR_DODGE)
+        return Self(BL_COMP_OP_COLOR_DODGE) 
 
     @staticmethod
     @always_inline
     fn color_burn() -> Self:
-        return Self(BL_COMP_OP_COLOR_BURN)
+        return Self(BL_COMP_OP_COLOR_BURN)    
 
     @staticmethod
     @always_inline
     fn linear_burn() -> Self:
-        return Self(BL_COMP_OP_LINEAR_BURN)
+        return Self(BL_COMP_OP_LINEAR_BURN)    
+
+    @staticmethod
+    @always_inline
+    fn linear_light() -> Self:
+        return Self(BL_COMP_OP_LINEAR_LIGHT) 
 
     @staticmethod
     @always_inline
     fn pin_light() -> Self:
-        return Self(BL_COMP_OP_PIN_LIGHT)
+        return Self(BL_COMP_OP_PIN_LIGHT) 
 
     @staticmethod
     @always_inline
     fn hard_light() -> Self:
-        return Self(BL_COMP_OP_HARD_LIGHT)
+        return Self(BL_COMP_OP_HARD_LIGHT) 
 
     @staticmethod
     @always_inline
     fn soft_light() -> Self:
-        return Self(BL_COMP_OP_SOFT_LIGHT)
+        return Self(BL_COMP_OP_SOFT_LIGHT) 
 
     @staticmethod
     @always_inline
     fn difference() -> Self:
-        return Self(BL_COMP_OP_DIFFERENCE)
+        return Self(BL_COMP_OP_DIFFERENCE) 
 
     @staticmethod
     @always_inline
     fn exclusion() -> Self:
-        return Self(BL_COMP_OP_EXCLUSION)
+        return Self(BL_COMP_OP_EXCLUSION) 
+
+
 
 @value
 struct BLStrokeCap:
@@ -299,7 +315,7 @@ struct BLStrokeCap:
 #============================================================================================================
 
 @value
-struct RotatePoint:
+struct BLRotatePoint:
     var r : Float64
     var x : Float64
     var y : Float64
@@ -437,8 +453,8 @@ struct BLContext:
     
     @always_inline
     fn rotate_pt(self, radians : Float64, x : Float64, y : Float64) -> BLResult:
-        var bytes = RotatePoint(radians,x,y)
-        var ptr = UnsafePointer[RotatePoint](bytes).bitcast[UInt8]()
+        var bytes = BLRotatePoint(radians,x,y)
+        var ptr = UnsafePointer[BLRotatePoint](bytes).bitcast[UInt8]()
         return self._apply_transform( BL_TRANSFORM_OP_ROTATE_PT, ptr)
 
     @always_inline
@@ -460,6 +476,13 @@ struct BLContext:
     fn scale(self, p : BLPoint) -> BLResult:
         var ptr = UnsafePointer[BLPoint]( p).bitcast[UInt8]()
         return self._apply_transform( BL_TRANSFORM_OP_SCALE, ptr)
+
+    @always_inline
+    fn set_pattern_quality_bilinear(self) -> BLResult:
+        return self._b2d._handle.get_function[blContextSetHint]("blContextSetHint")(self.ptr_core(), BL_CONTEXT_HINT_PATTERN_QUALITY, BL_PATTERN_QUALITY_BILINEAR)
+
+    fn set_pattern_quality_nearest(self) -> BLResult:
+        return self._b2d._handle.get_function[blContextSetHint]("blContextSetHint")(self.ptr_core(), BL_CONTEXT_HINT_PATTERN_QUALITY, BL_PATTERN_QUALITY_NEAREST)
 
     @always_inline
     fn set_stroke_width(self, width : Float64) -> BLResult:
@@ -582,3 +605,13 @@ struct BLContext:
         var ptr = UnsafePointer[BLPointI](origin)
         var ptr2 = glyphs_buffer.get_glyph_run()
         return self._b2d._handle.get_function[blContextFillGlyphRunIRgba32]("blContextFillGlyphRunIRgba32")(self.ptr_core(), ptr, font.ptr_core(), ptr2, colour.value )        
+    
+    @always_inline
+    fn set_fill_style_gradient(self, gradient : BLGradient) -> BLResult:
+        var ptr = gradient.get_core_ptr().bitcast[UInt8]()
+        return self._b2d._handle.get_function[blContextSetFillStyle]("blContextSetFillStyle")(self.ptr_core(), ptr)
+
+    @always_inline
+    fn set_fill_style_pattern(self, pattern : BLPattern) -> BLResult:
+        var ptr = pattern.get_core_ptr().bitcast[UInt8]()
+        return self._b2d._handle.get_function[blContextSetFillStyle]("blContextSetFillStyle")(self.ptr_core(), ptr)

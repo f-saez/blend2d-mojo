@@ -93,22 +93,4 @@ struct BLMatrix2D:
                 self.m10==other.m10 and self.m11==other.m11 and
                 self.m20==other.m20 and self.m21==other.m21
 
-    @staticmethod
-    fn validation() raises:
-        var x = 1.12
-        var y = 1.456
-        var max = 100
-        var m = BLMatrix2D()
-        var m2 = BLMatrix2D()
-        for _ in range(max):
-            m.translate_scalar(x,y)
-            m.scale_scalar(x,y)
-            m.scale_scalar(-x,-y)
-            m.translate_scalar(-x,-y)
-
-            m2.translate(x,y)
-            m2.scale(x,y)
-            m2.scale(-x,-y)
-            m2.translate(-x,-y)
-
-            assert_true(m2.equal(m))    
+ 

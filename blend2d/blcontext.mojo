@@ -116,7 +116,11 @@ alias blContextStrokeUtf8TextDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePo
 alias blContextFillUtf8TextD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[UInt8], Int) -> BLResult
 alias blContextFillUtf8TextDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[UInt8], Int, UInt32) -> BLResult
 
+alias blContextBlitScaledImageI = fn(UnsafePointer[BLContextCore], UnsafePointer[BLRectI], UnsafePointer[BLImageCore], UnsafePointer[BLRectI]) -> BLResult
+alias blContextBlitScaledImageD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLRect], UnsafePointer[BLImageCore], UnsafePointer[BLRect])  -> BLResult
+
 alias blContextSetHint = fn(UnsafePointer[BLContextCore], UInt32, UInt32) -> BLResult
+
 #============================================================================================================
 #
 #          The "enums" part
@@ -615,3 +619,11 @@ struct BLContext:
     fn set_fill_style_pattern(self, pattern : BLPattern) -> BLResult:
         var ptr = pattern.get_core_ptr().bitcast[UInt8]()
         return self._b2d._handle.get_function[blContextSetFillStyle]("blContextSetFillStyle")(self.ptr_core(), ptr)
+
+    @always_inline
+    fn blit_scale_imageI(self, src_rect : BLRectI, dest_img : BLImage, dst_rect : BLRectI) -> BLResult:
+        return self._b2d._handle.get_function[blContextBlitScaledImageI]("blContextBlitScaledImageI")(self.ptr_core(), UnsafePointer[BLRectI](src_rect), dest_img.get_core_ptr(), UnsafePointer[BLRectI](dst_rect))
+
+    @always_inline
+    fn blit_scale_imageD(self, src_rect : BLRect, dest_img : BLImage, dst_rect : BLRect) -> BLResult:
+        return self._b2d._handle.get_function[blContextBlitScaledImageD]("blContextBlitScaledImageD")(self.ptr_core(), UnsafePointer[BLRect](src_rect), dest_img.get_core_ptr(), UnsafePointer[BLRect](dst_rect))

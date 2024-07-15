@@ -23,7 +23,6 @@ def main():
     # here, we load the image we'll use as a pattern.
     # this image contains transparency data
     filename = Path("..").joinpath("examples").joinpath("Fish.qoi")
-    file_format = BLFileFormat.qoi()
     a = BLImage.from_file(filename)
     img_fish = a.take()    
 

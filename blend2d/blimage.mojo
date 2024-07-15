@@ -10,21 +10,21 @@ from .blcodec import BLArrayCore
 from .blcolor import BLRgba32
 from .blgeometry import BLSizeI, BLRect, BLRectI
 
-alias BLFormat_BL_FORMAT_NONE: UInt32   = 0
-alias BLFormat_BL_FORMAT_PRGB32: UInt32 = 1  # pre-multiplied alpha
-alias BLFormat_BL_FORMAT_XRGB32: UInt32 = 2  # alpha ignored, ie always opaque
-alias BLFormat_BL_FORMAT_A8: UInt32     = 3
+alias BL_FORMAT_NONE: UInt32   = 0
+alias BL_FORMAT_PRGB32: UInt32 = 1  # pre-multiplied alpha
+alias BL_FORMAT_XRGB32: UInt32 = 2  # alpha ignored, ie always opaque
+alias BL_FORMAT_A8: UInt32     = 3
 
-alias BLDataAccessFlags_BL_DATA_ACCESS_NO_FLAGS: Int32 = 0
-alias BLDataAccessFlags_BL_DATA_ACCESS_READ: Int32     = 1
-alias BLDataAccessFlags_BL_DATA_ACCESS_WRITE: Int32    = 2
-alias BLDataAccessFlags_BL_DATA_ACCESS_RW: Int32       = 3
+alias BL_DATA_ACCESS_NO_FLAGS: UInt32 = 0
+alias BL_DATA_ACCESS_READ: UInt32     = 1
+alias BL_DATA_ACCESS_WRITE: UInt32    = 2
+alias BL_DATA_ACCESS_RW: UInt32       = 3
 
-alias BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_NONE: Int32 = 0
-alias BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_NEAREST: Int32 = 1
-alias BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_BILINEAR: Int32 = 2
-alias BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_BICUBIC: Int32 = 3
-alias BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_LANCZOS: Int32 = 4
+alias BL_IMAGE_SCALE_FILTER_NONE: UInt32 = 0
+alias BL_IMAGE_SCALE_FILTER_NEAREST: UInt32 = 1
+alias BL_IMAGE_SCALE_FILTER_BILINEAR: UInt32 = 2
+alias BL_IMAGE_SCALE_FILTER_BICUBIC: UInt32 = 3
+alias BL_IMAGE_SCALE_FILTER_LANCZOS: UInt32 = 4
 
 alias blImageInit = fn(UnsafePointer[BLImageCore]) -> BLResult
 alias blImageReset = fn(UnsafePointer[BLImageCore]) -> BLResult
@@ -36,8 +36,17 @@ alias blImageReadFromFile = fn(UnsafePointer[BLImageCore], UnsafePointer[UInt8],
 
 alias blImageReadFromData = fn(UnsafePointer[BLImageCore], UnsafePointer[UInt8], Int, UnsafePointer[UInt8]) -> BLResult 
 
+alias blImageScale = fn(UnsafePointer[BLImageCore], UnsafePointer[BLImageCore], UnsafePointer[BLSizeI], UInt32) -> BLResult 
+alias blImageMakeMutable = fn(UnsafePointer[BLImageCore], UnsafePointer[BLImageData]) -> BLResult
+
 alias blImageCodecArrayInitBuiltInCodecs = fn(UnsafePointer[BLArrayCore], UInt32) -> BLResult
 alias blArrayInit = fn(UnsafePointer[BLArrayCore], UInt32) -> BLResult
+
+#============================================================================================================
+#
+#          The "enums" part
+#
+#============================================================================================================
 
 @value
 struct BLFileFormat:
@@ -72,32 +81,32 @@ struct BLFormat:
     fn __init__(inout self, value : UInt32):
         self.value = value
         self._bpp = 0
-        if value==BLFormat_BL_FORMAT_PRGB32: # pre-multiplied alpha
+        if value==BL_FORMAT_PRGB32: # pre-multiplied alpha
             self._bpp = 4
-        elif value==BLFormat_BL_FORMAT_XRGB32:# alpha ignored, ie always opaque
+        elif value==BL_FORMAT_XRGB32:# alpha ignored, ie always opaque
             self._bpp = 4
-        elif value==BLFormat_BL_FORMAT_A8:            
+        elif value==BL_FORMAT_A8:            
             self._bpp = 1
 
     @staticmethod
     @always_inline
     fn none() -> Self:
-        return Self(BLFormat_BL_FORMAT_NONE)
+        return Self(BL_FORMAT_NONE)
 
     @staticmethod
     @always_inline
     fn prgb32() -> Self:
-        return Self(BLFormat_BL_FORMAT_PRGB32)
+        return Self(BL_FORMAT_PRGB32)
 
     @staticmethod
     @always_inline
     fn xrgb32() -> Self:
-        return Self(BLFormat_BL_FORMAT_XRGB32)
+        return Self(BL_FORMAT_XRGB32)
 
     @staticmethod
     @always_inline
     fn a8() -> Self:
-        return Self(BLFormat_BL_FORMAT_A8)
+        return Self(BL_FORMAT_A8)
 
     @always_inline
     fn bpp(self) -> Int:
@@ -105,56 +114,76 @@ struct BLFormat:
 
 @value
 struct BLDataAccessFlag:     
-    
+    var value : UInt32
+
     @staticmethod
     @always_inline
     fn no_flags() -> Int32:
-        return BLDataAccessFlags_BL_DATA_ACCESS_NO_FLAGS
+        return BL_DATA_ACCESS_NO_FLAGS
 
     @staticmethod
     @always_inline
     fn read() -> Int32:
-        return BLDataAccessFlags_BL_DATA_ACCESS_READ     
+        return BL_DATA_ACCESS_READ     
 
     @staticmethod
     @always_inline
     fn write() -> Int32:
-        return BLDataAccessFlags_BL_DATA_ACCESS_WRITE          
+        return BL_DATA_ACCESS_WRITE          
 
     @staticmethod
     @always_inline
     fn rw() -> Int32:
-        return BLDataAccessFlags_BL_DATA_ACCESS_RW                 
+        return BL_DATA_ACCESS_RW                 
 
 @value
-struct BLImageScaleFilter:    
-    @staticmethod
-    @always_inline
-    fn none() -> Int32:
-      return BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_NONE
+struct BLImageScaleFilter:  
+    var value : UInt32
 
     @staticmethod
     @always_inline
-    fn nearest() -> Int32:
-      return BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_NEAREST
+    fn none() -> Self:
+      return Self(BL_IMAGE_SCALE_FILTER_NONE)
 
     @staticmethod
     @always_inline
-    fn bilinear() -> Int32:
-      return BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_BILINEAR
+    fn nearest() -> Self:
+      return Self(BL_IMAGE_SCALE_FILTER_NEAREST)
 
     @staticmethod
     @always_inline
-    fn bicubic() -> Int32:
-      return BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_BICUBIC
+    fn bilinear() -> Self:
+      return Self(BL_IMAGE_SCALE_FILTER_BILINEAR)
 
     @staticmethod
     @always_inline
-    fn lanczos() -> Int32:
-      return BLImageScaleFilter_BL_IMAGE_SCALE_FILTER_LANCZOS
+    fn bicubic() -> Self:
+      return Self(BL_IMAGE_SCALE_FILTER_BICUBIC)
+
+    @staticmethod
+    @always_inline
+    fn lanczos() -> Self:
+      return Self(BL_IMAGE_SCALE_FILTER_LANCZOS)
+
+#============================================================================================================
+#
+#  the low-level Blend2D interface structs
+#
+#============================================================================================================
+@value
+struct BLImageCore:
+    var detail : BLObjectDetail
+
+    fn __init__(inout self):
+        self.detail = BLObjectDetail()
 
       
-        
+#============================================================================================================
+#
+#          The basic structs
+#
+#============================================================================================================    
+
 @value
 struct BLImageData(Stringable):
     var pixels: UnsafePointer[UInt8, AddressSpace.GENERIC]
@@ -179,13 +208,11 @@ struct BLImageData(Stringable):
         result.append(String("flags: ")+String(self.flags))
         return result.get_value()
 
-@value
-struct BLImageCore:
-    var detail : BLObjectDetail
-
-    fn __init__(inout self):
-        self.detail = BLObjectDetail()
-
+#============================================================================================================
+#
+#  the usable objects
+#
+#============================================================================================================
 @value
 struct BLImage:
     var _b2d : LibBlend2D
@@ -266,20 +293,56 @@ struct BLImage:
     fn refresh_data(inout self) -> BLResult:
         """
             return some data on the image. It's very light, it just copy some internal stuff to
-            a struct.
+            a struct we keep at hand.
+            Sometimes, after dealing externally with the image, we need to refresh the values by interrogating
+            the blend2d's function.
         """
         var res = self._b2d._handle.get_function[blImageGetData]("blImageGetData")(self.get_core_ptr(), UnsafePointer(self._data))
         if res!=BL_SUCCESS:
-            # if it fails - I don't know why it could fail - but it could means the data retreived is garbage so.
+            # if it fails - I don't know why it could fail - it could means the data retreived is garbage so.
             self._data = BLImageData()
         return res
     
     fn get_data(self) -> BLImageData:
         """
-            return some data on the image. It's very light, it just copy some internal stuff to
-            a struct.
+            return some data on the image.
         """
         return self._data
+
+    fn make_mutable(self) -> BLResult:
+        """
+            return some data on the image.
+        """
+        return self._b2d._handle.get_function[blImageMakeMutable]("blImageMakeMutable")(self.get_core_ptr(), UnsafePointer[BLImageData](self._data))
+
+    fn scale_to_new_image(self, size : BLSizeI, filter : BLImageScaleFilter) -> Optional[BLImage]:
+        """
+            resize an image to [size] with [filter] as a filter.
+            If everything's ok, return the image as an Optional
+            The new image got the same format as the former one (alpha channel).
+            This function resize an image without using any context. You just take an existing 
+            image an produce another one with other dimensions
+            There are two scaling functions in BLContext with a little different purpose.
+        """
+        var result = Optional[BLImage](None)
+        var aaa = BLImage.new( size.w.cast[DType.int32]().value, size.h.cast[DType.int32]().value, self.get_format())
+        if aaa:
+            var img = aaa.take()
+            var res = self._b2d._handle.get_function[blImageScale]("blImageScale")(img.get_core_ptr(),self.get_core_ptr(),  UnsafePointer[BLSizeI](size), filter.value)
+            if res==BL_SUCCESS:
+                result = Optional[BLImage](img)
+        return result
+
+    fn scale_to_existing(self, dest_image : BLImage, filter : BLImageScaleFilter) -> BLResult:
+        """
+            resize an image to fit in an existing image with [filter] as a filter.
+            The point is exactly the same as the former one, but without the need to create an new image.
+            Let's say we need to resize 10 images to the same size.
+            It is more efficient to create a destination image once and resize every image into the existing one
+            than creating and disdcarding the same image 10 times.
+            note : you should use the same format for both the images, but I won't hold your hand on that.
+        """    
+        return self._b2d._handle.get_function[blImageScale]("blImageScale")(dest_image.get_core_ptr(),self.get_core_ptr(), UnsafePointer[BLSizeI](dest_image._data.size), filter.value)
 
     fn almost_equal(self, other :BLImage, rgba : Bool) -> Bool:
         """

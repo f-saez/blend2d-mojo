@@ -18,6 +18,7 @@ mojo build examples/04-basic_glyphs.mojo -o $DIR/04-basic_glyphs
 mojo build examples/05-path.mojo -o $DIR/05-path
 mojo build examples/06-gradients.mojo -o $DIR/06-gradients
 mojo build examples/07-patterns.mojo -o $DIR/07-patterns
+mojo build examples/08-scaling.mojo -o $DIR/08-scaling
 
 cd $DIR
 ./01-basics
@@ -27,3 +28,4 @@ cd $DIR
 ./05-path
 ./06-gradients
 ./07-patterns
+./08-scaling

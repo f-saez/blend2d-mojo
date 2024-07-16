@@ -67,7 +67,9 @@ alias BL_STROKE_CAP_POSITION_END: UInt32 = 1
 alias BL_RENDERING_QUALITY_ANTIALIAS = 0
 alias BL_CONTEXT_FLUSH_NO_FLAGS = 0
 
-
+alias BL_CLIP_MODE_ALIGNED_RECT:UInt32 = 0 # Clipping to a rectangle that is aligned to the pixel grid.
+alias BL_CLIP_MODE_UNALIGNED_RECT:UInt32 = 1 # Clipping to a rectangle that is not aligned to pixel grid.
+alias BL_CLIP_MODE_MASK:UInt32 = 2 # Clipping to a non-rectangular area that is defined by using mask. 
 
 alias blContextInitAs = fn(UnsafePointer[BLContextCore], UnsafePointer[BLImageCore], UnsafePointer[BLContextCreateInfo]) -> BLResult
 alias blContextEnd = fn(UnsafePointer[BLContextCore]) -> BLResult
@@ -117,7 +119,11 @@ alias blContextFillUtf8TextD = fn(UnsafePointer[BLContextCore], UnsafePointer[BL
 alias blContextFillUtf8TextDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[UInt8], Int, UInt32) -> BLResult
 
 alias blContextBlitScaledImageI = fn(UnsafePointer[BLContextCore], UnsafePointer[BLRectI], UnsafePointer[BLImageCore], UnsafePointer[BLRectI]) -> BLResult
-alias blContextBlitScaledImageD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLRect], UnsafePointer[BLImageCore], UnsafePointer[BLRect])  -> BLResult
+alias blContextBlitScaledImageD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLRect], UnsafePointer[BLImageCore], UnsafePointer[BLRectI])  -> BLResult
+
+alias blContextClipToRectI = fn(UnsafePointer[BLContextCore], UnsafePointer[BLRectI]) -> BLResult
+alias blContextClipToRectD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLRect]) -> BLResult
+alias blContextRestoreClipping = fn(UnsafePointer[BLContextCore]) -> BLResult
 
 alias blContextSetHint = fn(UnsafePointer[BLContextCore], UInt32, UInt32) -> BLResult
 
@@ -338,6 +344,25 @@ struct BLContextCookie:
     fn __init__(inout self):
         self.data = InlineArray[UInt64, 2](0)
 
+# I don't like the way Mojo handle List.
+# poping out elements of an empty List will get you garbage or worse, a crash
+# let's call that a "secure" feature
+@value
+struct Cookies:
+    var items : List[BLContextCookie]
+
+    fn __init__(inout self):
+        self.items = List[BLContextCookie]()
+
+    fn push(inout self, owned cookie : BLContextCookie):
+        self.items.append(cookie)
+
+    fn pop(inout self) -> Optional[BLContextCookie]:
+        var result = Optional[BLContextCookie](None)
+        if self.items.size>0:
+            result = Optional[BLContextCookie]( self.items.pop())
+        return result
+
 @value
 struct BLContextCreateInfo(Stringable):
     var flags: UInt32
@@ -372,12 +397,20 @@ struct BLContextCreateInfo(Stringable):
 struct BLContext:
     var _b2d    : LibBlend2D
     var _core   : BLContextCore
-    var cookies : List[BLContextCookie]
+    var cookies : Cookies
+    var width_pixels : Int32
+    var height_pixels : Int32
+    var width_pixels_f64 : Float64
+    var height_pixels_f64 : Float64
 
-    fn __init__(inout self, owned b2d : LibBlend2D, owned core : BLContextCore):
+    fn __init__(inout self, owned b2d : LibBlend2D, owned core : BLContextCore, w : Int32, h : Int32):
         self._b2d = b2d
         self._core = core
-        self.cookies = List[BLContextCookie]()
+        self.cookies = Cookies()
+        self.width_pixels = w
+        self.height_pixels = h
+        self.width_pixels_f64 = w.cast[DType.float64]()
+        self.height_pixels_f64 = h.cast[DType.float64]()
 
     fn ptr_core(self) -> UnsafePointer[BLContextCore]:
         return UnsafePointer[BLContextCore](self._core)
@@ -393,16 +426,18 @@ struct BLContext:
             var core = BLContextCore()
             var res = b2d._handle.get_function[blContextInitAs]("blContextInitAs")(UnsafePointer(core), img.get_core_ptr(), UnsafePointer(info))
             if res==BL_SUCCESS:
-                result = Optional[Self](Self(b2d^, core^))
+                var w = img.get_width()
+                var h = img.get_height()
+                result = Optional[Self](Self(b2d^, core^, w, h))
             else:
                 print("BLContext failed with ",error_code(res))           
         return result
 
-    fn end(self) -> BLResult:
-        return self._b2d._handle.get_function[blContextEnd]("blContextEnd")(self.ptr_core())        
-
-    fn __del__(owned self):
+    fn end(inout self) -> BLResult:
+        var res = self._b2d._handle.get_function[blContextEnd]("blContextEnd")(self.ptr_core())        
         _ = self._b2d._handle.get_function[blContextDestroy]("blContextDestroy")(self.ptr_core()) 
+        self._b2d.close()
+        return res       
 
     fn flush(self) -> BLResult:
         return self._b2d._handle.get_function[blContextFlush]("blContextFlush")(self.ptr_core())        
@@ -430,15 +465,17 @@ struct BLContext:
     @always_inline
     fn save(inout self) -> BLResult:
         var cookie = BLContextCookie()        
-        var result = self._b2d._handle.get_function[blContextSave]("blContextSave")(self.ptr_core(), UnsafePointer[BLContextCookie](cookie))    
-        self.cookies.append(cookie)
+        var result = self._b2d._handle.get_function[blContextSave]("blContextSave")(self.ptr_core(), UnsafePointer[BLContextCookie](cookie))   
+        if result==BL_SUCCESS: 
+            self.cookies.push(cookie)
         return result
 
     @always_inline
     fn restore(inout self) -> BLResult:
         var result = BL_ERROR_NO_MATCHING_COOKIE
-        if self.cookies.size>0:
-            var cookie = self.cookies.pop()
+        var aaa = self.cookies.pop()
+        if aaa:
+            var cookie = aaa.take()
             result = self._b2d._handle.get_function[blContextRestore]("blContextRestore")(self.ptr_core(), UnsafePointer[BLContextCookie](cookie))            
         return result
 
@@ -497,52 +534,52 @@ struct BLContext:
         return self._b2d._handle.get_function[blContextSetStrokeStyleRgba32]("blContextSetStrokeStyleRgba32")(self.ptr_core(), colour.value)
 
     @always_inline
-    fn set_stroke_rect(self, rect : BLRectI) -> BLResult:
-        return self._b2d._handle.get_function[blContextStrokeRectI]("blContextStrokeRectI")(self.ptr_core(), UnsafePointer(rect))
+    fn set_stroke_rectI(self, rect : BLRectI) -> BLResult:
+        return self._b2d._handle.get_function[blContextStrokeRectI]("blContextStrokeRectI")(self.ptr_core(), UnsafePointer[BLRectI](rect))
 
     @always_inline
-    fn stroke_rect_rgba32(self, rect : BLRectI, colour : BLRgba32) -> BLResult:
-        return self._b2d._handle.get_function[blContextStrokeRectIRgba32]("blContextStrokeRectIRgba32")(self.ptr_core(), UnsafePointer(rect), colour.value)
+    fn stroke_rectI_rgba32(self, rect : BLRectI, colour : BLRgba32) -> BLResult:
+        return self._b2d._handle.get_function[blContextStrokeRectIRgba32]("blContextStrokeRectIRgba32")(self.ptr_core(), UnsafePointer[BLRectI](rect), colour.value)
 
     @always_inline
-    fn fill_rect(self, rect : BLRectI) -> BLResult:
-        return self._b2d._handle.get_function[blContextFillRectI]("blContextFillRectI")(self.ptr_core(), UnsafePointer(rect))
+    fn fill_rectI(self, rect : BLRectI) -> BLResult:
+        return self._b2d._handle.get_function[blContextFillRectI]("blContextFillRectI")(self.ptr_core(), UnsafePointer[BLRectI](rect))
 
     @always_inline
-    fn fill_rect_rgba32(self, rect : BLRectI, colour : BLRgba32) -> BLResult:
-        return self._b2d._handle.get_function[blContextFillRectIRgba32]("blContextFillRectIRgba32")(self.ptr_core(), UnsafePointer(rect), colour.value)
+    fn fill_rectI_rgba32(self, rect : BLRectI, colour : BLRgba32) -> BLResult:
+        return self._b2d._handle.get_function[blContextFillRectIRgba32]("blContextFillRectIRgba32")(self.ptr_core(), UnsafePointer[BLRectI](rect), colour.value)
 
     @always_inline
-    fn stroke_rectd(self, rect : BLRect) -> BLResult:
-        return self._b2d._handle.get_function[blContextStrokeRectD]("blContextStrokeRectD")(self.ptr_core(), UnsafePointer(rect))
+    fn stroke_rectD(self, rect : BLRect) -> BLResult:
+        return self._b2d._handle.get_function[blContextStrokeRectD]("blContextStrokeRectD")(self.ptr_core(), UnsafePointer[BLRect](rect))
 
     @always_inline
-    fn stroke_rectd_rgba32(self, rect : BLRect, colour : BLRgba32) -> BLResult:
+    fn stroke_rectD_rgba32(self, rect : BLRect, colour : BLRgba32) -> BLResult:
         return self._b2d._handle.get_function[blContextStrokeRectDRgba32]("blContextStrokeRectDRgba32")(self.ptr_core(), UnsafePointer(rect), colour.value)
 
     @always_inline
-    fn filld_rect(self, rect : BLRect) -> BLResult:
-        return self._b2d._handle.get_function[blContextFillRectD]("blContextFillRectD")(self.ptr_core(), UnsafePointer(rect))
+    fn filld_rectD(self, rect : BLRect) -> BLResult:
+        return self._b2d._handle.get_function[blContextFillRectD]("blContextFillRectD")(self.ptr_core(), UnsafePointer[BLRect](rect))
 
     @always_inline
-    fn fill_rectd_rgba32(self, rect : BLRect, colour : BLRgba32) -> BLResult:
-        return self._b2d._handle.get_function[blContextFillRectDRgba32]("blContextFillRectDRgba32")(self.ptr_core(), UnsafePointer(rect), colour.value)
+    fn fill_rectD_rgba32(self, rect : BLRect, colour : BLRgba32) -> BLResult:
+        return self._b2d._handle.get_function[blContextFillRectDRgba32]("blContextFillRectDRgba32")(self.ptr_core(), UnsafePointer[BLRect](rect), colour.value)
 
     @always_inline
-    fn stroke_pathd(self, origin : BLPoint, path : BLPath) -> BLResult:
-        return self._b2d._handle.get_function[blContextStrokePathD]("blContextStrokePathD")(self.ptr_core(), UnsafePointer(origin), path.ptr_core())
+    fn stroke_pathD(self, origin : BLPoint, path : BLPath) -> BLResult:
+        return self._b2d._handle.get_function[blContextStrokePathD]("blContextStrokePathD")(self.ptr_core(), UnsafePointer[BLPoint](origin), path.ptr_core())
 
     @always_inline
-    fn stroke_pathd_rgba32(self, origin : BLPoint, path : BLPath, colour : BLRgba32) -> BLResult:
-        return self._b2d._handle.get_function[blContextStrokePathDRgba32]("blContextStrokePathDRgba32")(self.ptr_core(), UnsafePointer(origin), path.ptr_core(), colour.value)
+    fn stroke_pathD_rgba32(self, origin : BLPoint, path : BLPath, colour : BLRgba32) -> BLResult:
+        return self._b2d._handle.get_function[blContextStrokePathDRgba32]("blContextStrokePathDRgba32")(self.ptr_core(), UnsafePointer[BLPoint](origin), path.ptr_core(), colour.value)
 
     @always_inline
-    fn fill_pathd(self, origin : BLPoint, path : BLPath) -> BLResult:
-        return self._b2d._handle.get_function[blContextFillPathD]("blContextFillPathD")(self.ptr_core(), UnsafePointer(origin), path.ptr_core() )
+    fn fill_pathD(self, origin : BLPoint, path : BLPath) -> BLResult:
+        return self._b2d._handle.get_function[blContextFillPathD]("blContextFillPathD")(self.ptr_core(), UnsafePointer[BLPoint](origin), path.ptr_core() )
 
     @always_inline
-    fn fill_pathd_rgba32(self, origin : BLPoint, path : BLPath, colour : BLRgba32) -> BLResult:
-        return self._b2d._handle.get_function[blContextFillPathDRgba32]("blContextFillPathDRgba32")(self.ptr_core(), UnsafePointer(origin), path.ptr_core(), colour.value )
+    fn fill_pathD_rgba32(self, origin : BLPoint, path : BLPath, colour : BLRgba32) -> BLResult:
+        return self._b2d._handle.get_function[blContextFillPathDRgba32]("blContextFillPathDRgba32")(self.ptr_core(), UnsafePointer[BLPoint](origin), path.ptr_core(), colour.value )
 
     @always_inline
     fn set_stroke_start_cap(self, x : BLStrokeCap) -> BLResult:
@@ -622,8 +659,36 @@ struct BLContext:
 
     @always_inline
     fn blit_scale_imageI(self, src_rect : BLRectI, dest_img : BLImage, dst_rect : BLRectI) -> BLResult:
+        """
+         blit and rescale dest_img on the image described by the context
+         dst_rect : rectangle defining the part of dest_image used for the blitting
+         xy_rect : rectangle defining the area in the destination used for receiving dest_img
+         
+         to describe it differently
+         copy src_rect from dest_img to xy_rect.
+        """        
         return self._b2d._handle.get_function[blContextBlitScaledImageI]("blContextBlitScaledImageI")(self.ptr_core(), UnsafePointer[BLRectI](src_rect), dest_img.get_core_ptr(), UnsafePointer[BLRectI](dst_rect))
 
     @always_inline
-    fn blit_scale_imageD(self, src_rect : BLRect, dest_img : BLImage, dst_rect : BLRect) -> BLResult:
-        return self._b2d._handle.get_function[blContextBlitScaledImageD]("blContextBlitScaledImageD")(self.ptr_core(), UnsafePointer[BLRect](src_rect), dest_img.get_core_ptr(), UnsafePointer[BLRect](dst_rect))
+    fn blit_scale_imageD(self, xy_rect : BLRect, dest_img : BLImage, dst_rect : BLRectI) -> BLResult:
+        """
+         blit and rescale dest_img on the image described by the context.
+         dst_rect : rectangle defining the part of dest_image used for the blitting.
+         xy_rect : rectangle defining the area in the destination used for receiving dest_img.
+
+         to describe it differently : copy src_rect from dest_img to xy_rect.
+        """
+        return self._b2d._handle.get_function[blContextBlitScaledImageD]("blContextBlitScaledImageD")(self.ptr_core(), UnsafePointer[BLRect](xy_rect), dest_img.get_core_ptr(), UnsafePointer[BLRectI](dst_rect))
+    
+    @always_inline
+    fn clip_to_rectI(self, rect : BLRectI) -> BLResult:
+        return self._b2d._handle.get_function[blContextClipToRectI]("blContextClipToRectI")(self.ptr_core(), UnsafePointer[BLRectI](rect))
+
+    @always_inline
+    fn clip_to_rectD(self, rect : BLRect) -> BLResult:
+        return self._b2d._handle.get_function[blContextClipToRectD]("blContextClipToRectD")(self.ptr_core(), UnsafePointer[BLRect](rect))
+
+    @always_inline
+    fn restore_clipping(self) -> BLResult:
+        return self._b2d._handle.get_function[blContextRestoreClipping]("blContextRestoreClipping")(self.ptr_core())
+

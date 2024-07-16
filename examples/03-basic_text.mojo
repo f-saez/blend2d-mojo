@@ -90,7 +90,7 @@ def main():
                     # rotating a context may be confusing, so I will draw the origin 
                     # to help understand what's going on
                     var small_rect = BLRect(origin.x,origin.y,5,5)
-                    _ = ctx.fill_rectd_rgba32(small_rect, BLRgba32.rgb(40,200,40))
+                    _ = ctx.fill_rectD_rgba32(small_rect, BLRgba32.rgb(40,200,40))
                     _ = ctx.restore()
 
                     # here, are returning to the previous state, meaning identity
@@ -99,13 +99,16 @@ def main():
                     origin.x = 720
                     small_rect = BLRect(origin.x,origin.y,5,5)
                     _ = ctx.fill_utf8_textD_rgba32(origin, font, text, l_text, BLRgba32.rgb(40,200,200)) 
-                    _ = ctx.fill_rectd_rgba32(small_rect, c)
+                    _ = ctx.fill_rectD_rgba32(small_rect, c)
 
                     _ = ctx.end()
-                    # the following line is very important, at least until I figure out to create a context manager
-                    # for fontface
-                    _ = fontface.get_face_count() # just to make sure fontface live up to this point.
+                    
+                    # until I figure out what's wrong with Mojo's destructor, destruction is manual
+                    font.destroy()
 
                     var file_format = BLFileFormat.qoi()
                     var filename = file_format.set_extension( Path("03-basic_text"))
                     _ = img.to_file(filename, file_format)
+                fontface.destroy() 
+
+        img.destroy() # until I figure out what's wrong with Mojo's destructor, destruction is manual

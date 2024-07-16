@@ -38,14 +38,14 @@ def main():
     # ok, we've got a pattern. Let's use it as a filling style
     _ = ctx.set_fill_style_pattern(pattern)
     # now, we fill our rectangle with our pattern
-    _ = ctx.fill_rect( BLRectI(50,100, 400, 350))
+    _ = ctx.fill_rectI( BLRectI(50,100, 400, 350))
     # what do we see ? the point(0,0) of our pattern seems to start at the point(0,0)
     # of our image. Ok, let's change that.
     _ = pattern.translate(50,500)
     # mandatory. The pattern has changed, we need to pass the "new"
     # pattern to the context  
     _ = ctx.set_fill_style_pattern(pattern)
-    _ = ctx.fill_rect( BLRectI(50,500, 400, 350))
+    _ = ctx.fill_rectI( BLRectI(50,500, 400, 350))
     # that's better, no ?
 
     # need a smaller fish ?
@@ -55,7 +55,7 @@ def main():
     _ = pattern.translate(500,100)
     _ = pattern.scale(0.35, 0.35)
     _ = ctx.set_fill_style_pattern(pattern)
-    _ = ctx.fill_rect( BLRectI(500,100, 400, 350))
+    _ = ctx.fill_rectI( BLRectI(500,100, 400, 350))
 
     # last one, let's add a rotation
     _ = pattern.identity()
@@ -65,11 +65,14 @@ def main():
     _ = pattern.rotate_point(-0.88, img_fish.get_width_f64()/2, img_fish.get_height_f64()/2)
     _ = pattern.scale(0.65, 0.65)
     _ = ctx.set_fill_style_pattern(pattern)
-    _ = ctx.fill_rect( BLRectI(500,500, 400, 350))
+    _ = ctx.fill_rectI( BLRectI(500,500, 400, 350))
 
     _ = ctx.end()
-    _ = img_fish
+    img_fish.destroy()
+    pattern.destroy()
 
     file_format = BLFileFormat.qoi()
     filename = file_format.set_extension( Path("07-patterns"))
-    _ = img.to_file(filename, file_format)    
+    _ = img.to_file(filename, file_format)   
+
+    img.destroy() # until I figure out what's wrong with Mojo's destructor, destruction is manual

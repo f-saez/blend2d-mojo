@@ -39,13 +39,13 @@ def create_path() -> Optional[BLPath]:
 def build_scene(ctx : BLContext, path1 : BLPath, path2 : BLPath):
     # first test, a small rectangle at the center of the image
     # remember, a BLRect is (x,y, width, height)
-    _ = ctx.fill_rectd_rgba32( BLRect(0.49, 0.49, 0.02, 0.02), BLRgba32.rgb(145,145,145))
+    _ = ctx.fill_rectD_rgba32( BLRect(0.49, 0.49, 0.02, 0.02), BLRgba32.rgb(145,145,145))
     # the change of scale impact obviously the stroke size
     _ = ctx.set_stroke_width(0.002)
     # we stroke, it means everything will be drawn
-    _ = ctx.stroke_pathd_rgba32( BLPoint(0.0,0.0), path1, BLRgba32.rgb(125,125,125))
+    _ = ctx.stroke_pathD_rgba32( BLPoint(0.0,0.0), path1, BLRgba32.rgb(125,125,125))
     # we only fill, meaning we will draw the things that can be filled (so, no line or elipse)
-    _ = ctx.fill_pathd_rgba32( BLPoint(0.45,0.3), path2, BLRgba32.rgb(85,85,125))
+    _ = ctx.fill_pathD_rgba32( BLPoint(0.45,0.3), path2, BLRgba32.rgb(85,85,125))
     
     # drawing a path is fine but knowing if a point is in a path is better
     # so let's start shooting!
@@ -54,32 +54,32 @@ def build_scene(ctx : BLContext, path1 : BLPath, path2 : BLPath):
 
     p = BLPoint(0.276,0.546)
     if path1.hit_test(p):
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
     else:
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)
     p = BLPoint(0.273, 0.272)
     if path1.hit_test(p):
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
     else:
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)  
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)  
     p = BLPoint(0.1, 0.8)
     if path1.hit_test(p):
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
     else:
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)  
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)  
     
     # great, but if with path2, we'll have a trouble.
     # why ? let's see
     p = BLPoint(0.919,0.456)
     if path2.hit_test(p):
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
     else:
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)
     p = BLPoint(0.851, 0.565)
     if path2.hit_test(p):
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), red)
     else:
-        _ = ctx.fill_rectd_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)   
+        _ = ctx.fill_rectD_rgba32( BLRect(p.x-0.005, p.y-0.005, 0.01, 0.01), gray)   
     # the coordinates used here are screen coordinates. So if we look
     # at the image, we'll see the 2 points with 2 of them right in the path and 
     # none out of the path
@@ -162,8 +162,14 @@ def main():
     build_scene(ctx, path1, path3)                                    
     # the usual stuff
     _ = ctx.end()
+
+    # until I figure out what's wrong with Mojo's destructor, destruction is manual
+    path1.destroy()
+    path2.destroy()
+    path2.destroy()
+
     file_format = BLFileFormat.qoi()
     filename = file_format.set_extension( Path("05-path-2"))
     _ = img.to_file(filename, file_format)
 
-
+    img.destroy()# until I figure out what's wrong with Mojo's destructor, destruction is manual

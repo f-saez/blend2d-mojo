@@ -21,12 +21,12 @@ fn validation_image() raises:
     r = ctx.fill_all()
     assert_equal(r, BL_SUCCESS)
 
-    r = ctx.fill_rect_rgba32(BLRectI(150,150,320,240), BLRgba32.rgb(55,55,55) )
+    r = ctx.fill_rectI_rgba32(BLRectI(150,150,320,240), BLRgba32.rgb(55,55,55) )
     assert_equal(r, BL_SUCCESS)
 
     assert_equal(r, BL_SUCCESS)
     var rect = BLRect(150,150,320,240)
-    r = ctx.fill_rectd_rgba32(rect, BLRgba32.rgb(55,55,165) )
+    r = ctx.fill_rectD_rgba32(rect, BLRgba32.rgb(55,55,165) )
     assert_equal(r, BL_SUCCESS)
     r = ctx.save()
     assert_equal(r, BL_SUCCESS)
@@ -34,10 +34,10 @@ fn validation_image() raises:
     assert_equal(r, BL_SUCCESS)
     r = ctx.rotate_pt(0.1, rect.x+rect.w/2, rect.y+rect.h/2)
     assert_equal(r, BL_SUCCESS)  
-    r = ctx.stroke_rectd_rgba32(rect, BLRgba32.rgb(165,55,55) )
+    r = ctx.stroke_rectD_rgba32(rect, BLRgba32.rgb(165,55,55) )
     assert_equal(r, BL_SUCCESS)
 
-    r = ctx.restore()
+    r = ctx.end()
     assert_equal(r, BL_SUCCESS)
     var file_format = BLFileFormat.qoi()
     var filename = file_format.set_extension( Path("test").joinpath("image"))
@@ -49,6 +49,9 @@ fn validation_image() raises:
     var img_ref = aaa.take()
 
     assert_true(img_ref.almost_equal(img, True))
+    
+    img_ref.destroy()    
+    img.destroy()
 
     os.path.path.remove(filename)
 
@@ -78,7 +81,9 @@ fn validation_codecs() raises:
     assert_equal(img2.get_height(), 471)
     assert_equal(img2.get_format().value, BLFormat.prgb32().value)  
     assert_true(img.almost_equal(img2, False))
-                             
+    img.destroy()    
+    img1.destroy()                  
+    img2.destroy()                  
 
 fn validation() raises:
     validation_image()

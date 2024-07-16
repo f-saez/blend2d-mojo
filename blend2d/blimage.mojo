@@ -215,24 +215,26 @@ struct BLImageData(Stringable):
 #============================================================================================================
 @value
 struct BLImage:
-    var _b2d : LibBlend2D
-    var _core : BLImageCore
-    var _data : BLImageData
+    var _b2d   : LibBlend2D
+    var _core  : BLImageCore
+    var _data  : BLImageData
+    var _ratio : Float64
 
     fn __init__(inout self, owned b2d : LibBlend2D, owned core : BLImageCore):
         self._b2d = b2d
         self._core = core
         self._data = BLImageData()
+        self._ratio = 1.
         _ = self.refresh_data()
 
-    fn __del__(owned self):
-        # I'm not sure in what order the destructor destroy his objects
-        # but if I let him do it in is his own way, I run into troubles with LibBlend2D's destructor
-        # maybe a bug, maybe a misunderstanding, maybe a lifetime thing, ...
-        # to solve this, I close manually LibBlend2D after I'm done with it.
-        # Not a big deal.
-        _ = self._b2d._handle.get_function[blImageDestroy]("blImageDestroy")(UnsafePointer(self._core))
-        self._b2d.close()
+    fn destroy(inout self):
+        # I've try to use the destructor but I cannot make head or tails on how it works and when it works
+        # because it seems to be fired sometimes for no reason or at the wrong time,
+        # and the next time you call a function of this object, thinking it is in a working state, you'll end-up 
+        # with a crash.
+        if not self._b2d.is_destroyed():
+            _ = self._b2d._handle.get_function[blImageDestroy]("blImageDestroy")(UnsafePointer(self._core))
+            self._b2d.close()
 
     @staticmethod
     fn new(width : Int, height : Int, format : BLFormat) -> Optional[Self]:
@@ -249,7 +251,7 @@ struct BLImage:
                         var img = Self(b2d^, core^)
                         result = Optional[Self](img)
                 if res!=BL_SUCCESS:
-                    print("BLFontData failed with ",error_code(res))  
+                    print("BLImage failed with ",error_code(res))  
         return result
 
     fn create_context(self, threadcount : UInt32) -> Optional[BLContext]:
@@ -271,6 +273,10 @@ struct BLImage:
     @always_inline
     fn get_height_f64(self) -> Float64:
         return self._data.size.h.cast[DType.float64]()
+
+    @always_inline
+    fn get_ratio(self) -> Float64:
+        return self._ratio
 
     @always_inline
     fn get_format(self) -> BLFormat:
@@ -298,9 +304,12 @@ struct BLImage:
             the blend2d's function.
         """
         var res = self._b2d._handle.get_function[blImageGetData]("blImageGetData")(self.get_core_ptr(), UnsafePointer(self._data))
-        if res!=BL_SUCCESS:
+        if res==BL_SUCCESS:
+            self._ratio = self.get_width_f64() / self.get_height_f64()
+        else:
             # if it fails - I don't know why it could fail - it could means the data retreived is garbage so.
             self._data = BLImageData()
+            self._ratio = 1.
         return res
     
     fn get_data(self) -> BLImageData:
@@ -386,7 +395,7 @@ struct BLImage:
     fn to_file(self, filename : Path, file_format : BLFileFormat) raises -> BLResult:
         create_path_if_not_exists(filename)
         var filename1 = file_format.set_extension(filename).__str__()
-        var ptr = filename1.unsafe_uint8_ptr()
+        var ptr = filename1.unsafe_uint8_ptr()        
         var res = self._b2d._handle.get_function[blImageWriteToFile]("blImageWriteToFile")(self.get_core_ptr(), ptr, UnsafePointer[UInt8]())
         _ = filename1
         return res

@@ -69,5 +69,8 @@ def validation():
     img_ref = a.take() 
 
     assert_true( img.almost_equal(img_ref, True))
-
+    
+    pattern.destroy()
+    img_ref.destroy()
+    img.destroy()
     

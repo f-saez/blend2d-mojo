@@ -1,6 +1,4 @@
 from blend2d.blimage import BLImage,  BLFileFormat, BLFormat, BLImageScaleFilter
-from blend2d.blcontext import BLCompOp
-from blend2d.blerrorcode import error_code
 from time.time import now
 from pathlib import Path
 
@@ -23,7 +21,7 @@ def main():
     w = 820.0
     h = w * img_src.get_height_f64() / img_src.get_width_f64()
     aaa = BLImage.new(w.cast[DType.int32]().value, h.cast[DType.int32]().value, img_src.get_format()) # more or less the same aspect/ratio
-    # why 820x563 ? If Ii've reduced the image to, let's say, 4000x2749, the downsize will not had been 
+    # why 820x563 ? If I've reduced the image to, let's say, 4000x2749, the downsize will not had been 
     # enough to show some difference between the filters. If we can choose between 4 filters, 
     # it's for the obvious reason that they produce different results at differents speeds
     # it's usually the the uglier the fastest, but, as always, it's not so simple.
@@ -39,25 +37,25 @@ def main():
     _ = img_src.scale_to_existing(img_downsized, BLImageScaleFilter.nearest())
     toc = now() - tic
     print("time downsize / Nearest neighbor: ", convert_to_ms(toc), "ms")
-    _ = img_downsized.to_file(Path("01_nearest_neighbor.qoi"), file_format)
+    _ = img_downsized.to_file(Path("08_scaling-01_nearest_neighbor.qoi"), file_format)
 
     tic = now()
     _ = img_src.scale_to_existing(img_downsized, BLImageScaleFilter.bilinear())
     toc = now() - tic
     print("time downsize / bilinear: ", convert_to_ms(toc), "ms")
-    _ = img_downsized.to_file(Path("02_bilinear.qoi"), file_format)
+    _ = img_downsized.to_file(Path("08_scaling-02_bilinear.qoi"), file_format)
 
     tic = now()
     _ = img_src.scale_to_existing(img_downsized, BLImageScaleFilter.bicubic())
     toc = now() - tic
     print("time downsize / bicubic: ", convert_to_ms(toc), "ms")       
-    _ = img_downsized.to_file(Path("03_bicubic.qoi"), file_format)
+    _ = img_downsized.to_file(Path("08_scaling-03_bicubic.qoi"), file_format)
 
     tic = now()
     _ = img_src.scale_to_existing(img_downsized, BLImageScaleFilter.lanczos())
     toc = now() - tic
     print("time downsize / Lanczos: ", convert_to_ms(toc), "ms")       
-    _ = img_downsized.to_file(Path("04_lanczos.qoi"), file_format)
+    _ = img_downsized.to_file(Path("08_scaling-04_lanczos.qoi"), file_format)
     # usually, for downsizing, bilinear is the best ratio speed/quality
 
     # now let's upscale. Usually, nobody do an upscaling that big with these kind of filters
@@ -69,26 +67,30 @@ def main():
     _ = img_downsized.scale_to_existing(img_src, BLImageScaleFilter.nearest())
     toc = now() - tic
     print("time upscale / Nearest neighbor: ", convert_to_ms(toc), "ms")
-    _ = img_src.to_file(Path("05_nearest_neighbor.qoi"), file_format)
+    _ = img_src.to_file(Path("08_scaling-05_nearest_neighbor.qoi"), file_format)
 
     tic = now()
     _ = img_downsized.scale_to_existing(img_src, BLImageScaleFilter.bilinear())
     toc = now() - tic
     print("time upscale / bilinear: ", convert_to_ms(toc), "ms")
-    _ = img_src.to_file(Path("06_nearest_neighbor.qoi"), file_format)
+    _ = img_src.to_file(Path("08_scaling-06_nearest_neighbor.qoi"), file_format)
 
     tic = now()
     _ = img_downsized.scale_to_existing(img_src, BLImageScaleFilter.bicubic())
     toc = now() - tic
     print("time upscale / bicubic: ", convert_to_ms(toc), "ms")
-    _ = img_src.to_file(Path("07_bicubic.qoi"), file_format)
+    _ = img_src.to_file(Path("08_scaling-07_bicubic.qoi"), file_format)
 
     tic = now()
     _ = img_downsized.scale_to_existing(img_src, BLImageScaleFilter.lanczos())
     toc = now() - tic
     print("time upscale / Lanczos: ", convert_to_ms(toc), "ms")
-    _ = img_src.to_file(Path("08_lanczos.qoi"), file_format)
+    _ = img_src.to_file(Path("08_scaling-08_lanczos.qoi"), file_format)
 
     # obviously, it was fast.
     # obviously, you'll want to compare with the original, with a 100 % zoom.
     # and obviously, it will hurt your eyes.
+
+    # until I figure out what's wrong with Mojo's destructor, destruction is manual
+    img_downsized.destroy()
+    img_src.destroy() 

@@ -143,16 +143,21 @@ def main():
                         # be carefull, all the data from text_metrics will be unavailable with the Path.
                         _ = font.get_glyphrun_outlines(glyphs_buffer, path)
                         # we already know how to draw a path
-                        _ = ctx.fill_pathd_rgba32(BLPoint.new(380,520), path, BLRgba32.rgb(105,115,135))
+                        _ = ctx.fill_pathD_rgba32(BLPoint.new(380,520), path, BLRgba32.rgb(105,115,135))
+                        
                         # here our path contains all the glyphs from "Glyph to Path"
                         # but we could do differently and extract a path for each glyph
                         # it's how we could do some "special effects" like drawing a text that follows a curve.
+                        path.destroy()
+                        glyphs_buffer.destroy()
 
                     _ = ctx.end()
-                    # the following line is very important, at least until I figure out to create a context manager
-                    # for fontface
-                    _ = fontface.get_face_count() # just to make sure fontface live up to this point.
+                    # until I figure out what's wrong with Mojo's destructor, destruction is manual
+                    font.destroy()
 
                     var file_format = BLFileFormat.qoi()
                     var filename = file_format.set_extension( Path("04-basic_glyphs"))
                     _ = img.to_file(filename, file_format)
+                fontface.destroy() 
+
+        img.destroy() # until I figure out what's wrong with Mojo's destructor, destruction is manual                 

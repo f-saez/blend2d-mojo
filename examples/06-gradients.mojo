@@ -45,6 +45,7 @@ def main():
     #  we define the filling style with our gradient
     _ = ctx.set_fill_style_gradient(linear)
     _ = ctx.fill_all()
+    linear.destroy() # until I figure out what's wrong with Mojo's destructor, destruction is manual
     
     # let's try something else
     # a small gradient the size of our rectangle
@@ -59,8 +60,9 @@ def main():
     _ = linear.add_stop(0.25, BLRgba32.rgb(250,80,130))
     _ = linear.add_stop(0.75, BLRgba32.rgb(125,200,130))
     _ = ctx.set_fill_style_gradient(linear)
-    _ = ctx.fill_rect(rect )
-    
+    _ = ctx.fill_rectI(rect )
+    linear.destroy() # until I figure out what's wrong with Mojo's destructor, destruction is manual
+
     # let's try padding
     # instead of having our gradient begening and ending with our rectangle
     # let downsize it a little bit to see what happens after and before
@@ -75,7 +77,8 @@ def main():
     linear = ab.take()
     _ = linear.add_stop(1.0, BLRgba32.rgb(75,75,210))
     _ = ctx.set_fill_style_gradient(linear)
-    _ = ctx.fill_rect(rect )
+    _ = ctx.fill_rectI(rect )
+    linear.destroy() # until I figure out what's wrong with Mojo's destructor, destruction is manual
 
     rect = BLRectI(500,50, 400, 350)
     values = BLLinearGradientValues.from_rectI(rect)
@@ -88,7 +91,8 @@ def main():
     linear = ab.take()
     _ = linear.add_stop(1.0, BLRgba32.rgb(75,75,210))
     _ = ctx.set_fill_style_gradient(linear)
-    _ = ctx.fill_rect(rect )
+    _ = ctx.fill_rectI(rect )
+    linear.destroy()
 
     rect = BLRectI(500,500, 400, 350)
     values = BLLinearGradientValues.from_rectI(rect)
@@ -101,10 +105,14 @@ def main():
     linear = ab.take()
     _ = linear.add_stop(1.0, BLRgba32.rgb(75,75,210))
     _ = ctx.set_fill_style_gradient(linear)
-    _ = ctx.fill_rect(rect )
+    _ = ctx.fill_rectI(rect )
     _ = ctx.end()
-    
+
+    # until I figure out what's wrong with Mojo's destructor, destruction is manual
+    linear.destroy()
 
     file_format = BLFileFormat.qoi()
     filename = file_format.set_extension( Path("06-gradients"))
-    _ = img.to_file(filename, file_format)    
+    _ = img.to_file(filename, file_format)   
+
+    img.destroy() # until I figure out what's wrong with Mojo's destructor, destruction is manual

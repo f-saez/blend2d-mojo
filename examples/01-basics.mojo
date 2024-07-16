@@ -47,7 +47,7 @@ def main():
                 # so our rectangle will start at pixel 150,150 and end at pixel 150+320, 150+240
                 var rectI = BLRectI(150,150,320,240)
                 # we define the filling color so we don't use the default one
-                _ = ctx.fill_rect_rgba32(rectI, BLRgba32.rgb(55,55,55) )
+                _ = ctx.fill_rectI_rgba32(rectI, BLRgba32.rgb(55,55,55) )
 
                 # ok, done. What about something more exotic like a rotation ?
                 # first thing, we need to save our context so we can restore it later
@@ -71,13 +71,13 @@ def main():
                 # emphasis on the D after rect.
                 # let's define the width of our stroke
                 _ = ctx.set_stroke_width(2.5)
-                _ = ctx.stroke_rectd_rgba32(rect, BLRgba32.rgb(165,55,55) )
+                _ = ctx.stroke_rectD_rgba32(rect, BLRgba32.rgb(165,55,55) )
                 # done, we can restore our context to it's previous state
                 # only if we have something else to do with it
                 _ = ctx.restore()
                 # we have finish, no need to keep the context.
                 # this point is important, we cannot forget to end the context
-                # think of this as : I've give you a bunch of command, execute them.
+                # think of this as : I've given you a bunch of command, execute them.
                 _ = ctx.end()
 
                 # as we don't draw on a windows (again, more on that later)
@@ -88,4 +88,4 @@ def main():
                 var filename = file_format.set_extension( Path("01-basics"))
                 _ = img.to_file(filename, file_format)
 
-
+        img.destroy() # until I solve something with Mojo's destructor, destruction is manual

@@ -197,7 +197,7 @@ struct BLRectI(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)+String("w: ")+String(self.w)+String(" h: ")+String(self.h)
+        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)+String(" w: ")+String(self.w)+String(" h: ")+String(self.h)
 
 @value
 struct BLRect(Stringable):
@@ -216,7 +216,7 @@ struct BLRect(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)+String("w: ")+String(self.w)+String(" h: ")+String(self.h)
+        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)+String(" w: ")+String(self.w)+String(" h: ")+String(self.h)
 
 @value
 struct BLLine(Stringable):
@@ -235,7 +235,7 @@ struct BLLine(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String("x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)
+        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String(" x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)
 
 @value
 struct BLTriangle(Stringable):
@@ -258,7 +258,7 @@ struct BLTriangle(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String("x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)+String("x2: ")+String(self.x2)+String(" y2: ")+String(self.y2)
+        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String(" x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)+String(" x2: ")+String(self.x2)+String(" y2: ")+String(self.y2)
 
 @value
 struct BLRoundRect(Stringable):
@@ -281,7 +281,7 @@ struct BLRoundRect(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)+String("w: ")+String(self.w)+String(" h: ")+String(self.h)+String("rx: ")+String(self.rx)+String(" ry: ")+String(self.ry)
+        return String("x: ")+String(self.x)+String(" y: ")+String(self.y)+String(" w: ")+String(self.w)+String(" h: ")+String(self.h)+String(" rx: ")+String(self.rx)+String(" ry: ")+String(self.ry)
 
 @value
 struct BLCircle(Stringable):
@@ -317,7 +317,7 @@ struct BLElipse(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x: ")+String(self.cx)+String(" y: ")+String(self.cy)+String("rx: ")+String(self.rx)+String("ry: ")+String(self.ry)
+        return String("x: ")+String(self.cx)+String(" y: ")+String(self.cy)+String(" rx: ")+String(self.rx)+String(" ry: ")+String(self.ry)
 
 @value
 struct BLApproximationOptions:
@@ -362,7 +362,7 @@ struct BLArc(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x: ")+String(self.cx)+String(" y: ")+String(self.cy)+String("rx: ")+String(self.rx)+String("ry: ")+String(self.ry)+String("start:")+String(self.start)+String("sweep: ")+String(self.sweep)
+        return String("x: ")+String(self.cx)+String(" y: ")+String(self.cy)+String(" rx: ")+String(self.rx)+String(" ry: ")+String(self.ry)+String( "start:")+String(self.start)+String("sweep: ")+String(self.sweep)
 
 
 
@@ -383,7 +383,7 @@ struct BLBox(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String("x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)
+        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String(" x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)
 
 @value
 struct BLBoxI(Stringable):
@@ -402,7 +402,7 @@ struct BLBoxI(Stringable):
         """
             just for debuging purpose.
         """
-        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String("x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)
+        return String("x0: ")+String(self.x0)+String(" y0: ")+String(self.y0)+String(" x1: ")+String(self.x1)+String(" y1: ")+String(self.y1)
 
 @value
 struct BLPoint(Stringable):

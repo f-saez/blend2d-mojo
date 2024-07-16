@@ -164,6 +164,7 @@ struct BLGradientStop:
 #  the usable objects
 #
 #============================================================================================================
+@value
 struct BLRgba32(Stringable):
     var value: UInt32  # 32-bit RGBA color (8-bit per component) stored as `0xAARRGGBB
 
@@ -197,7 +198,7 @@ struct BLRgba32(Stringable):
     @staticmethod
     @always_inline
     fn black() -> Self:
-        return Self.rgba(0,0,0,0)
+        return Self.rgba(0,0,0,255)
         
     @staticmethod
     @always_inline
@@ -294,12 +295,7 @@ struct BLGradient:
         self._b2d = b2d
         self._core = core
 
-    fn __del__(owned self):
-        # I'm not sure in what order the destructor destroy his objects
-        # but if I let him do it in is his own way, I run into troubles with LibBlend2D's destructor
-        # maybe a bug, maybe a misunderstanding, maybe a lifetime thing, ...
-        # to solve this, I close manually LibBlend2D after I'm done with it.
-        # Not a big deal.
+    fn destroy(owned self):
         _ = self._b2d._handle.get_function[blGradientDestroy]("blGradientDestroy")(self.get_core_ptr())
         self._b2d.close()   
 

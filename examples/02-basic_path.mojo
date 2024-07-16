@@ -50,8 +50,8 @@ def main():
                 _ = ctx.set_stroke_width( 2.5 )
                 # our path describe a shape and we want to draw it starting at pixel 45,53
                 # if you remember -20, it means we will draw something at pixel (45-20).
-                _ = ctx.fill_pathd_rgba32( BLPoint.new(45,53), path, BLRgba32.rgb(125,65,215) )
-                _ = ctx.stroke_pathd_rgba32( BLPoint.new(45,53), path, BLRgba32.rgb(165,65,125) )
+                _ = ctx.fill_pathD_rgba32( BLPoint.new(45,53), path, BLRgba32.rgb(125,65,215) )
+                _ = ctx.stroke_pathD_rgba32( BLPoint.new(45,53), path, BLRgba32.rgb(165,65,125) )
 
                 # ok, done. let's draw something else.
                 # why keep our object, we just clear it
@@ -76,13 +76,13 @@ def main():
                 _ = ctx.set_stroke_start_cap(BLStrokeCap.triangle())    
                 _ = ctx.set_stroke_end_cap(BLStrokeCap.triangle_rev())    
                 _ = ctx.set_stroke_width(25.0) # large enough to see somehting
-                _ = ctx.stroke_pathd_rgba32(BLPoint.new(380,22), path, BLRgba32.rgb(115,125,145))
+                _ = ctx.stroke_pathD_rgba32(BLPoint.new(380,22), path, BLRgba32.rgb(115,125,145))
                 
                 # we will draw the same shape at a different place with different caps
                 _ = ctx.set_stroke_start_cap(BLStrokeCap.round())    
                 _ = ctx.set_stroke_end_cap(BLStrokeCap.butt())    
                 _ = ctx.set_stroke_width(25.0) # large enough to see somehting
-                _ = ctx.stroke_pathd_rgba32(BLPoint.new(380,422), path, BLRgba32.rgb(155,125,185))
+                _ = ctx.stroke_pathD_rgba32(BLPoint.new(380,422), path, BLRgba32.rgb(155,125,185))
                 
                 # a last one
                 _ = path.clear()
@@ -94,16 +94,20 @@ def main():
                 # I don't save the context because it is the last operation
                 _ = ctx.identity()
                 _ = ctx.rotate_pt(0.2, 277,444)
-                _ = ctx.fill_pathd_rgba32(p, path, BLRgba32.rgb(215,0,0))        
+                _ = ctx.fill_pathD_rgba32(p, path, BLRgba32.rgb(215,0,0))        
                 _ = ctx.set_stroke_width(3.0)    
-                _ = ctx.stroke_pathd_rgba32(p, path, BLRgba32.rgb(15,15,15))
+                _ = ctx.stroke_pathD_rgba32(p, path, BLRgba32.rgb(15,15,15))
                 
                 # the usual stuff
                 _ = ctx.end()
+                
+                _ = path.destroy() # until I solve something with Mojo's destructor, destruction is manual
+
                 var file_format = BLFileFormat.qoi()
                 var filename = file_format.set_extension( Path("02-basic_path"))
                 _ = img.to_file(filename, file_format)
-
+        
+        img.destroy() # until I solve something with Mojo's destructor, destruction is manual
 
 
 

@@ -219,9 +219,9 @@ struct BLPath:
         var r = self._b2d._handle.get_function[blPathHitTest]("blPathHitTest")(self.get_core_ptr(), UnsafePointer[BLPoint](point), BL_FILL_RULE_NON_ZERO)
         return r == BL_HIT_TEST_IN
 
-    fn __del__(owned self):
-        # same comment as BLImage
-        _ = self._b2d._handle.get_function[blPathDestroy]("blPathDestroy")(UnsafePointer(self._core)) 
-        self._b2d.close()
+    fn destroy(owned self):
+        if not self._b2d.is_destroyed():
+            _ = self._b2d._handle.get_function[blPathDestroy]("blPathDestroy")(UnsafePointer(self._core)) 
+            self._b2d.close()
 
  

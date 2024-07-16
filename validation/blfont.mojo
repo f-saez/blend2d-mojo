@@ -19,6 +19,7 @@ def BLFontFace_validation():
     assert_true(aaa)
     var face = aaa.take()
     assert_equal(face.get_face_count(), 1)
+    face.destroy()
 
 def BLFont_validation():
     var filename = Path("test").joinpath("ReadexPro-Regular.ttf")
@@ -46,6 +47,9 @@ def BLFont_validation():
     assert_almost_equal(metrics.underline_thickness, 2.1, atol=0.01)
     assert_almost_equal(metrics.strikethrough_position, -15.33, atol=0.01)
     assert_almost_equal(metrics.strikethrough_thickness, 2.1, atol=0.01)
+    
+    face.destroy()
+    font.destroy()
 
 def validation_text():
     var tmp = BLImage.new(1024,768, BLFormat.xrgb32())
@@ -120,7 +124,9 @@ def validation_text():
     
     # fontface must live longer than font and I haven't found any other way to do that than this.
     # I've tried "with" but only got crashes
-    _ = fontface.get_face_count()
+    
+    font.destroy()
+    fontface.destroy()
 
     var file_format = BLFileFormat.qoi()
     filename = file_format.set_extension( Path("test").joinpath("text"))
@@ -131,6 +137,9 @@ def validation_text():
     assert_true(aae)
     var img_ref = aae.take()
     assert_true(img_ref.almost_equal(img, False))
+    
+    img.destroy()
+    img_ref.destroy()
 
     os.path.path.remove(filename)       
 
@@ -218,22 +227,23 @@ def validation_glyph():
     r = font.get_glyphrun_outlines(glyphs_buffer, path)
     assert_equal(r, BL_SUCCESS)     
     var p = BLPoint.new(380,520)
-    r = ctx.fill_pathd_rgba32(p, path, BLRgba32.rgb(105,115,135))
+    r = ctx.fill_pathD_rgba32(p, path, BLRgba32.rgb(105,115,135))
     assert_equal(r, BL_SUCCESS)
     r = ctx.set_stroke_width(3)    
     assert_equal(r, BL_SUCCESS)    
-    r = ctx.stroke_pathd_rgba32(p, path, BLRgba32.rgba(255,255,255,255))
+    r = ctx.stroke_pathD_rgba32(p, path, BLRgba32.rgba(255,255,255,255))
     r = ctx.set_stroke_width(1)    
     assert_equal(r, BL_SUCCESS)    
-    r = ctx.stroke_pathd_rgba32(p, path, BLRgba32.rgba(15,15,15,255))
+    r = ctx.stroke_pathD_rgba32(p, path, BLRgba32.rgba(15,15,15,255))
     assert_equal(r, BL_SUCCESS)    
 
     r = ctx.end()
     assert_equal(r, BL_SUCCESS)
     
-    # fontface must live longer than font and I haven't found any other way to do that than this.
-    # I've tried implementing "with" but only got crashes
-    _ = fontface.get_face_count()
+    fontface.destroy()
+    glyphs_buffer.destroy()
+    font.destroy()
+    fontface.destroy()
 
     var file_format = BLFileFormat.qoi()
     filename = file_format.set_extension( Path("test").joinpath("glyphs"))
@@ -244,7 +254,10 @@ def validation_glyph():
     assert_true(aae)
     var img_ref = aae.take()
     assert_true(img_ref.almost_equal(img, False))
-
+    
+    img_ref.destroy()
+    img.destroy()
+    
     os.path.path.remove(filename)    
 
 def validation():

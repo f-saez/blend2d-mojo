@@ -38,11 +38,11 @@ fn validation() raises:
     r = path.close()
     assert_equal(r, BL_SUCCESS)
     var p = BLPoint.new(15,13)
-    r = ctx.fill_pathd_rgba32(p, path, BLRgba32.rgb(215,0,0))
+    r = ctx.fill_pathD_rgba32(p, path, BLRgba32.rgb(215,0,0))
     assert_equal(r, BL_SUCCESS)
     r = ctx.set_stroke_width(3.0)    
     assert_equal(r, BL_SUCCESS)
-    r = ctx.stroke_pathd_rgba32(p, path, BLRgba32.rgb(15,15,15))
+    r = ctx.stroke_pathD_rgba32(p, path, BLRgba32.rgb(15,15,15))
     assert_equal(r, BL_SUCCESS)
     
     r = path.clear()
@@ -60,7 +60,7 @@ fn validation() raises:
     p = BLPoint.new(380,22)
     r = ctx.set_stroke_width(22.0)    
     assert_equal(r, BL_SUCCESS)    
-    r = ctx.stroke_pathd_rgba32(p, path, BLRgba32.rgb(115,125,145))
+    r = ctx.stroke_pathD_rgba32(p, path, BLRgba32.rgb(115,125,145))
     assert_equal(r, BL_SUCCESS)    
     r = ctx.end()
     assert_equal(r, BL_SUCCESS)
@@ -74,5 +74,9 @@ fn validation() raises:
     assert_true(aaa)
     var img_ref = aaa.take()
     assert_true(img_ref.almost_equal(img, True))
+    
+    path.destroy()
+    img_ref.destroy()
+    img.destroy()
 
     os.path.path.remove(filename)

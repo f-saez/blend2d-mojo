@@ -26,19 +26,27 @@ fn get_libname() -> StringLiteral:
 @value
 struct LibBlend2D:
     var _handle      : ffi.DLHandle
+    var _destroyed   : Bool
 
     fn __init__(inout self, handle : ffi.DLHandle):
         self._handle = handle
+        self._destroyed = False
 
-    fn close(owned self):
+    fn close(inout self):
         # why not putting this in the destructor ?
         # easy answer : because it may crash 
         # long answer :
         # if I put this in the destructor and embed this in a object
-        # I cannot control if this destructor will be called at the begening or the end of the parent destructor
-        # and if the parent destructor need this do destroy himself properly, I will run into troubles
-        # so, to solve this, I destroy manually what need to be destroyed in a proper order
-        self._handle.close()
+        # I will run into troubles for reason I can't understand. The destructor seems to be fired
+        # at the wrong time or for no reason because the object is still used a few lines later.
+        # to solve this, I destroy manually what need to be destroyed in a proper order
+        if not self.is_destroyed():
+            self._handle.close()
+            self._destroyed = True
+
+    @always_inline
+    fn is_destroyed(self) -> Bool:
+        return self._destroyed
 
     @staticmethod
     fn new() -> Optional[LibBlend2D]:

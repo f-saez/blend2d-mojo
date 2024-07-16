@@ -50,10 +50,10 @@ struct BLPattern:
         self._core = core
         self._matrix = BLMatrix2D()
 
-    fn __del__(owned self):
-        # same comment as for BLImage
-        _ = self._b2d._handle.get_function[blPatternDestroy]("blPatternDestroy")(self.get_core_ptr())
-        self._b2d.close()   
+    fn destroy(owned self):
+        if not self._b2d.is_destroyed():
+            _ = self._b2d._handle.get_function[blPatternDestroy]("blPatternDestroy")(self.get_core_ptr())
+            self._b2d.close()   
 
     @always_inline
     fn get_core_ptr(self) -> UnsafePointer[BLPatternCore]:

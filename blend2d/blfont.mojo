@@ -472,10 +472,11 @@ struct BLFontData:
     fn get_face_count(self) -> UInt32:
         return self._face_count
 
-    fn __del__(owned self):
-        # same comment as BLImage    
-        _ = self._b2d._handle.get_function[blFontDataDestroy]("blFontDataDestroy")(self.ptr_core())
-        self._b2d.close()
+    fn destroy(owned self):
+        if not self._b2d.is_destroyed():
+            _ = self._b2d._handle.get_function[blFontDataDestroy]("blFontDataDestroy")(self.ptr_core())
+            self._b2d.close()
+
 
 @value
 struct BLFontFace:
@@ -523,10 +524,10 @@ struct BLFontFace:
                     print("BLFontData failed with ",error_code(res))           
         return result       
 
-    fn __del__(owned self):
-        # same comment as BLImage
-        _ = self._b2d._handle.get_function[blFontFaceDestroy]("blFontFaceDestroy")(self.ptr_core())
-        self._b2d.close()
+    fn destroy(owned self):
+        if not self._b2d.is_destroyed():
+            _ = self._b2d._handle.get_function[blFontFaceDestroy]("blFontFaceDestroy")(self.ptr_core())
+            self._b2d.close()
 
     fn __enter__(owned self) -> Self:
         return self^
@@ -604,10 +605,10 @@ struct BLFont:
     fn get_text_metrics(self, glyphs_buffer : BLGlyphBuffer, text_metrics : BLTextMetrics) -> BLResult:
         return self._b2d._handle.get_function[blFontGetTextMetrics]("blFontGetTextMetrics")(self.ptr_core(), glyphs_buffer.ptr_core(), UnsafePointer[BLTextMetrics](text_metrics))  
 
-    fn __del__(owned self):
-        _ = self._b2d._handle.get_function[blFontDestroy]("blFontDestroy")(self.ptr_core())
-        # same comment as BLImage
-        self._b2d.close()        
+    fn destroy(owned self):
+        if not self._b2d.is_destroyed():
+            _ = self._b2d._handle.get_function[blFontDestroy]("blFontDestroy")(self.ptr_core())
+            self._b2d.close()        
 
 
 
@@ -691,8 +692,8 @@ struct BLGlyphBuffer:
     fn get_glyph_run(self) -> UnsafePointer[BLGlyphRun]:
         return self._b2d._handle.get_function[blGlyphBufferGetGlyphRun]("blGlyphBufferGetGlyphRun")(self.ptr_core())
 
-    fn __del__(owned self):
-        _ = self._b2d._handle.get_function[blGlyphBufferDestroy]("blGlyphBufferDestroy")(self.ptr_core())
-        # same comment as BLImage
-        self._b2d.close()   
+    fn destroy(owned self):
+        if not self._b2d.is_destroyed():
+            _ = self._b2d._handle.get_function[blGlyphBufferDestroy]("blGlyphBufferDestroy")(self.ptr_core())
+            self._b2d.close()   
 

@@ -9,6 +9,7 @@ import blmatrix
 import blcontext
 import blcommon
 import helpers
+import blmipmap
 
 from blend2d.bllibblend2d import LibBlend2D
 from testing import assert_true
@@ -30,5 +31,6 @@ def main():
     blfont.validation()
     blmatrix.validation()
     blcontext.validation()
-    blcommon.validaiton()
+    blcommon.validation()
+    blmipmap.validation()
 

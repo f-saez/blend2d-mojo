@@ -18,5 +18,5 @@ def BLExtendMode_validation():
     assert_equal( BLExtendMode.reflect_x_repeat_y().value, BL_EXTEND_MODE_REFLECT_X_REPEAT_Y)
 
 
-def validaiton():
+def validation():
     BLExtendMode_validation()

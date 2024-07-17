@@ -259,6 +259,14 @@ struct BLImage:
         return stuff
 
     @always_inline
+    fn calculate_height(self, width : Int32) -> Int32:
+        """
+            given the aspect ratio, calculate what would be the height 
+            for a given width.
+        """
+        return (width.cast[DType.float64]()/self._ratio).roundeven().cast[DType.int32]()
+
+    @always_inline
     fn get_width(self) -> Int32:
         return self._data.size.w
     
@@ -393,11 +401,13 @@ struct BLImage:
         return result
 
     fn to_file(self, filename : Path, file_format : BLFileFormat) raises -> BLResult:
-        create_path_if_not_exists(filename)
-        var filename1 = file_format.set_extension(filename).__str__()
-        var ptr = filename1.unsafe_uint8_ptr()        
-        var res = self._b2d._handle.get_function[blImageWriteToFile]("blImageWriteToFile")(self.get_core_ptr(), ptr, UnsafePointer[UInt8]())
-        _ = filename1
+        var res = BL_ERROR_INVALID_HANDLE
+        if not self._b2d.is_destroyed():
+            create_path_if_not_exists(filename)
+            var filename1 = file_format.set_extension(filename).__str__()
+            var ptr = filename1.unsafe_uint8_ptr()        
+            var res = self._b2d._handle.get_function[blImageWriteToFile]("blImageWriteToFile")(self.get_core_ptr(), ptr, UnsafePointer[UInt8]())
+            _ = filename1
         return res
 
     @staticmethod

@@ -203,7 +203,7 @@ def validation_glyph():
         r = font.get_text_metrics(glyphs_buffer, text_metrics)
         assert_equal(r, BL_SUCCESS)
         origin.x = 512 - (text_metrics.bounding_box.x1 - text_metrics.bounding_box.x0) / 2
-        r = ctx.fill_glyph_run_rgba32(origin, font, glyphs_buffer, c)
+        r = ctx.fill_glyph_runI_rgba32(origin, font, glyphs_buffer, c)
         assert_equal(r, BL_SUCCESS)
         origin.y += (font_metrics.ascent + font_metrics.descent + font_metrics.line_gap).cast[DType.int32]()
 

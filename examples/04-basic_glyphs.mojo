@@ -111,7 +111,7 @@ def main():
                             # some basic centering around a point. and for that, we only need bounding_box                           
                             origin.x = 512 - (text_metrics.bounding_box.x1 - text_metrics.bounding_box.x0) / 2
                             # we fill the shape. 
-                            _ = ctx.fill_glyph_run_rgba32(origin, font, glyphs_buffer, c)
+                            _ = ctx.fill_glyph_runI_rgba32(origin, font, glyphs_buffer, c)
                             # now we need to jump to the next line. Remember font_metrics ?
                             # ascent + descent + line_gap
                             origin.y += (font_metrics.ascent + font_metrics.descent + font_metrics.line_gap).cast[DType.int32]()

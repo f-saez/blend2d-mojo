@@ -212,6 +212,14 @@ struct BLRect(Stringable):
         self.w = 0
         self.h = 0                  
 
+    fn __mul__(inout self, coef : Float64) -> BLRect:
+        return BLRect(
+            self.x*coef,
+            self.y*coef,
+            self.w*coef,
+            self.h*coef
+        )
+        
     fn __str__(self) -> String:
         """
             just for debuging purpose.

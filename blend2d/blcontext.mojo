@@ -99,8 +99,12 @@ alias blContextFillPathD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoin
 alias blContextFillPathDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLPathCore], UInt32) -> BLResult
 alias blContextFillAll = fn(UnsafePointer[BLContextCore]) -> BLResult
 alias blContextFillAllRgba32 = fn(UnsafePointer[BLContextCore], UInt32) -> BLResult
+
 alias blContextFillGlyphRunI = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPointI], UnsafePointer[BLFontCore], UnsafePointer[BLGlyphRun]) -> BLResult
 alias blContextFillGlyphRunIRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPointI], UnsafePointer[BLFontCore], UnsafePointer[BLGlyphRun], UInt32) -> BLResult
+alias blContextFillGlyphRunD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[BLGlyphRun]) -> BLResult
+alias blContextFillGlyphRunDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[BLGlyphRun], UInt32) -> BLResult
+
 
 alias blContextSetFillStyleRgba32 = fn(UnsafePointer[BLContextCore], UInt32) -> BLResult
 alias blContextSetFillStyle = fn(UnsafePointer[BLContextCore], UnsafePointer[UInt8]) -> BLResult
@@ -636,17 +640,30 @@ struct BLContext:
         return self._b2d._handle.get_function[blContextFillUtf8TextDRgba32]("blContextFillUtf8TextDRgba32")(self.ptr_core(), ptr, font.ptr_core(), text.unsafe_uint8_ptr(), length, colour.value )        
     
     @always_inline
-    fn fill_glyph_run(self, origin : BLPointI, font : BLFont, glyphs_buffer : BLGlyphBuffer) -> BLResult:
+    fn fill_glyph_runI(self, origin : BLPointI, font : BLFont, glyphs_buffer : BLGlyphBuffer) -> BLResult:
         var ptr = UnsafePointer[BLPointI](origin)
         var ptr2 = glyphs_buffer.get_glyph_run()
         return self._b2d._handle.get_function[blContextFillGlyphRunI]("blContextFillGlyphRunI")(self.ptr_core(), ptr, font.ptr_core(), ptr2 )        
 
     @always_inline
-    fn fill_glyph_run_rgba32(self, origin : BLPointI, font : BLFont, glyphs_buffer : BLGlyphBuffer, colour : BLRgba32) -> BLResult:
+    fn fill_glyph_runI_rgba32(self, origin : BLPointI, font : BLFont, glyphs_buffer : BLGlyphBuffer, colour : BLRgba32) -> BLResult:
         var ptr = UnsafePointer[BLPointI](origin)
         var ptr2 = glyphs_buffer.get_glyph_run()
         return self._b2d._handle.get_function[blContextFillGlyphRunIRgba32]("blContextFillGlyphRunIRgba32")(self.ptr_core(), ptr, font.ptr_core(), ptr2, colour.value )        
     
+    @always_inline
+    fn fill_glyph_runD(self, origin : BLPoint, font : BLFont, glyphs_buffer : BLGlyphBuffer) -> BLResult:
+        var ptr = UnsafePointer[BLPoint](origin)
+        var ptr2 = glyphs_buffer.get_glyph_run()
+        return self._b2d._handle.get_function[blContextFillGlyphRunD]("blContextFillGlyphRunD")(self.ptr_core(), ptr, font.ptr_core(), ptr2 )        
+
+    @always_inline
+    fn fill_glyph_runD_rgba32(self, origin : BLPoint, font : BLFont, glyphs_buffer : BLGlyphBuffer, colour : BLRgba32) -> BLResult:
+        var ptr = UnsafePointer[BLPoint](origin)
+        var ptr2 = glyphs_buffer.get_glyph_run()
+        return self._b2d._handle.get_function[blContextFillGlyphRunDRgba32]("blContextFillGlyphRunDRgba32")(self.ptr_core(), ptr, font.ptr_core(), ptr2, colour.value )        
+    
+
     @always_inline
     fn set_fill_style_gradient(self, gradient : BLGradient) -> BLResult:
         var ptr = gradient.get_core_ptr().bitcast[UInt8]()

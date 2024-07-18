@@ -8,9 +8,9 @@ from pathlib import Path
 
 @value
 struct BLMipmap:
-    var items  : List[BLImage]
-    var _b2d   : LibBlend2D
-    var _ratio : Float64
+    var items   : List[BLImage]
+    var _b2d    : LibBlend2D
+    var _ratio  : Float64
 
     fn __init__(inout self, owned b2d : LibBlend2D, owned img_ref : BLImage, levels : Int):
         """
@@ -88,23 +88,23 @@ struct BLMipmap:
             we always use the full image.
             the BLContext is a parameter but it could have been otherwise by passing 
             the mipmap to a context
-            blit_scale_imageI => Integer
+            blit_scale_imageI => Integer, it is in pixels
         .
         """
         var img = self.items[ self.find_level(src_rect.w) ]
         var rect2 = BLRectI(0,0, img.get_width(), img.get_height())
         return ctx.blit_scale_imageI(src_rect, img, rect2)
 
-    fn blit_scale_imageD(self, ctx : BLContext, src_rect : BLRect) -> BLResult:
+    fn blit_scale_imageD(self, ctx : BLContext, src_rect : BLRect, width : Int32) -> BLResult:
         """
             Mirror "BLContex.blit_scale_imageD" with a few differences.
             we always use the full image.
             the BLContext is a parameter but it could have been otherwise by passing 
             the mipmap to a context
-            blit_scale_imageD => Float64
+            blit_scale_imageD => Float64, so it may be in pixels, may be in [0,1]
         .
         """
-        var img = self.items[ self.find_level( src_rect.w.cast[DType.int32]() ) ]
+        var img = self.items[ self.find_level( width ) ]
         var rect2 = BLRectI(0,0, img.get_width(), img.get_height())
         return ctx.blit_scale_imageD(src_rect, img, rect2)
 
@@ -119,6 +119,13 @@ struct BLMipmap:
             for a given width.
         """
         return (width.cast[DType.float64]()/self._ratio).roundeven().cast[DType.int32]()
+    
+    fn calculate_height(self, width : Float64) -> Float64:
+        """
+            given the aspect ratio, calculate what would be the height 
+            for a given width.
+        """
+        return width/self._ratio
 
     fn destroy(inout self):
         # I've try to use the destructor but I cannot make head or tails on how it works and when it works

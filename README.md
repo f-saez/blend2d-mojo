@@ -3,6 +3,8 @@
 Blend2D bindings for Mojo. It's a work in progress.
 I'll try to follow the spirit of the C++ version as much as possible.
 
+Blend2D is production-ready, but not these bindings.
+
 ## what is Blend2D ?
 
 https://blend2d.com/
@@ -10,7 +12,7 @@ https://blend2d.com/
 https://github.com/blend2d/blend2d
 
 ## why Blend2D ?
-It is small, easy to use and it's API is stable.
+It is small, easy to use and it's API is stable, so ti is easy to maintain.
 
 Qt is far more than a 2D library.
 
@@ -30,27 +32,31 @@ You'll just have to put the .so file in your library path, or in your applicatio
 In the future, I will use static linking to ease deployment.
 
 ## What can we do with that ?
-For now, there is only 5 objects :
 
-- BLFont to draw text/glyphs
+- draw text/glyphs
 
-- BLPath to draw paths
+- draw paths
 
-- BLImage to manage bitmaps.
+- draw bitmaps/images and resize them
   
-- BLGradient for linear gradients (Conic and radial later)
+- draw linear gradients (Conic and radial later)
 
-- BLPattern for using an image as a pattern/texture
+- fill an image using another image as a pattern/texture
+
+- managing mipmaps
+
+- and the basic stuff : draw lines, circles, rectangles, compositing (Porter & Duff operators), transparency, 
 
 Only three file formats to load and save : JPEG, PNG, QOI
 
 If you haven't heard of QOI : https://qoiformat.org/
 
-There are more things to come obviously (clipping, mask, sprites, ...) :-)
+There are more things to come to the bindings (clipping, mask, ...)
 
 ## How am I suppose to use this ?
 
 Execute the file run_examples.sh and look at the files in examples.
 These are basic examples, with comments on how it works and how to use it.
 It should gives you a rough idea on how things works.
-I will add a tutorial for each new feature, don't worry.
+
+There are 11 tutorials than show the basic usage of Blend2D and they could apply to any other 2D library

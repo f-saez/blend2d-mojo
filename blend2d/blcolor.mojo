@@ -199,7 +199,7 @@ struct BLRgba32(Stringable):
     @always_inline
     fn black() -> Self:
         return Self.rgba(0,0,0,255)
-        
+    
     @staticmethod
     @always_inline
     fn rgb(r : UInt8, g : UInt8, b : UInt8) -> Self:

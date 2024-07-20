@@ -5,7 +5,8 @@ from .blpath import BLPath
 from .bllibblend2d import LibBlend2D
 from pathlib import Path
 import os
-from .helpers import create_path_if_not_exists, set_extension, string_to_ffi, print_string_ffi
+import .helpers
+from .helpers import create_path_if_not_exists
 from .blcodec import BLArrayCore
 from .blcolor import BLRgba32
 from .blgeometry import BLSizeI, BLRect, BLRectI
@@ -56,7 +57,7 @@ struct BLFileFormat:
         self.ext = value
 
     fn set_extension(self, filename : Path) -> Path:
-        return set_extension(filename, self.ext)
+        return helpers.set_extension(filename, self.ext)
 
     @staticmethod
     @always_inline
@@ -406,8 +407,8 @@ struct BLImage:
             create_path_if_not_exists(filename)
             var filename1 = file_format.set_extension(filename).__str__()
             var ptr = filename1.unsafe_uint8_ptr()        
-            var res = self._b2d._handle.get_function[blImageWriteToFile]("blImageWriteToFile")(self.get_core_ptr(), ptr, UnsafePointer[UInt8]())
-            _ = filename1
+            res = self._b2d._handle.get_function[blImageWriteToFile]("blImageWriteToFile")(self.get_core_ptr(), ptr, UnsafePointer[UInt8]())
+            _ = filename1       
         return res
 
     @staticmethod
@@ -416,7 +417,7 @@ struct BLImage:
             Only JPEG, PNG and QOI (https://qoiformat.org/).
         """
         var filename1 = filename.__str__()
-        var ptr = string_to_ffi(filename1)
+        var ptr = helpers.string_to_ffi(filename1)
         var result = Optional[Self](None)  
         var _b2d = LibBlend2D.new()
         if _b2d: 

@@ -477,7 +477,6 @@ struct BLFontData:
             _ = self._b2d._handle.get_function[blFontDataDestroy]("blFontDataDestroy")(self.ptr_core())
             self._b2d.close()
 
-
 @value
 struct BLFontFace:
     var _b2d      : LibBlend2D     
@@ -525,8 +524,9 @@ struct BLFontFace:
         return result       
 
     fn destroy(owned self):
-        if not self._b2d.is_destroyed():
+        if not self._b2d.is_destroyed():            
             _ = self._b2d._handle.get_function[blFontFaceDestroy]("blFontFaceDestroy")(self.ptr_core())
+            self.font_data.destroy()
             self._b2d.close()
 
     fn __enter__(owned self) -> Self:
@@ -605,12 +605,10 @@ struct BLFont:
     fn get_text_metrics(self, glyphs_buffer : BLGlyphBuffer, text_metrics : BLTextMetrics) -> BLResult:
         return self._b2d._handle.get_function[blFontGetTextMetrics]("blFontGetTextMetrics")(self.ptr_core(), glyphs_buffer.ptr_core(), UnsafePointer[BLTextMetrics](text_metrics))  
 
-    fn destroy(owned self):
-        if not self._b2d.is_destroyed():
+    fn destroy(owned self):           
+        if not self._b2d.is_destroyed():            
             _ = self._b2d._handle.get_function[blFontDestroy]("blFontDestroy")(self.ptr_core())
-            self._b2d.close()        
-
-
+            self._b2d.close()                
 
 @value
 struct BLGlyphBuffer:
@@ -618,12 +616,14 @@ struct BLGlyphBuffer:
     var _core        : BLGlyphBufferCore
     var glyph_info   : BLGlyphInfo
     var glyph_buffer : BLGlyphBufferImpl
+    var _text        : String
 
     fn __init__(inout self, owned b2d : LibBlend2D, owned core : BLGlyphBufferCore, owned glyph_info : BLGlyphInfo, owned glyph_buffer : BLGlyphBufferImpl):
         self._b2d = b2d
         self._core = core
         self.glyph_info = glyph_info
         self.glyph_buffer = glyph_buffer
+        self._text = String()
 
     fn ptr_core(self) -> UnsafePointer[BLGlyphBufferCore]:
         return UnsafePointer[BLGlyphBufferCore](self._core)
@@ -641,19 +641,18 @@ struct BLGlyphBuffer:
             var res = b2d._handle.get_function[blGlyphBufferInit]("blGlyphBufferInit")(ptr)
             if res==BL_SUCCESS:
                 result = Optional[Self]( Self(b2d^, core^, glyph_info^, glyph_buffer^))
-            if res!=BL_SUCCESS:
-                print("BLFontData failed with ",error_code(res))        
+            else:
+                print("BLGlyphBuffer failed with ",error_code(res))        
         return result  
 
     @always_inline
-    fn _set_text(self, text : String, length : Int, encoding : UInt32) -> BLResult:
-        var ptr = string_to_ffi(text)
-        var result = self._b2d._handle.get_function[blGlyphBufferSetText]("blGlyphBufferSetText")(self.ptr_core(), ptr, length, encoding)  
-        ptr.free()
-        return result
+    fn _set_text(inout self, owned text : String, length : Int, encoding : UInt32) -> BLResult:
+        self._text = text
+        var ptr = self._text.unsafe_uint8_ptr()
+        return self._b2d._handle.get_function[blGlyphBufferSetText]("blGlyphBufferSetText")(self.ptr_core(), ptr, length, encoding)  
 
     @always_inline
-    fn set_text_utf8(self, text : String, length : Int) -> BLResult:
+    fn set_text_utf8(inout self, owned text : String, length : Int) -> BLResult:
         return self._set_text(text, length, BL_TEXT_ENCODING_UTF8)  
 
     @always_inline
@@ -695,5 +694,5 @@ struct BLGlyphBuffer:
     fn destroy(owned self):
         if not self._b2d.is_destroyed():
             _ = self._b2d._handle.get_function[blGlyphBufferDestroy]("blGlyphBufferDestroy")(self.ptr_core())
-            self._b2d.close()   
+            self._b2d.close()                 
 

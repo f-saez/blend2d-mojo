@@ -168,7 +168,7 @@ def main():
     aaa = BLImage.new(1024,1024, BLFormat.prgb32())
     background = aaa.take()
 
-    filename = Path("examples").joinpath("Octopus.qoi")
+    filename = Path("..").joinpath("examples").joinpath("Octopus.qoi")
     bbb = Mipmap.from_file(filename,5)
     mipmap = bbb.take()
 

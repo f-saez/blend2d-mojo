@@ -231,24 +231,24 @@ def main():
     images = List[Image](capacity=3)
     
     # then we need our 3 images
-    filename = Path("examples").joinpath("Fish.qoi")
+    filename = Path("..").joinpath("examples").joinpath("Fish.qoi")
     aaa = Image.from_file(filename, "A fish", BLRgba32.rgb(248,110,22))
     img_fish = aaa.take()
     images.append( img_fish )
 
-    filename = Path("examples").joinpath("Octopus.qoi")
+    filename = Path("..").joinpath("examples").joinpath("Octopus.qoi")
     aaa = Image.from_file(filename, "An octopus", BLRgba32.rgb(110,220,52))
     img_octopus = aaa.take()
     images.append( img_octopus )
 
-    filename = Path("examples").joinpath("Whale.qoi")
+    filename = Path("..").joinpath("examples").joinpath("Whale.qoi")
     aaa = Image.from_file(filename, "An whale", BLRgba32.rgb(52,105,141))
     img_whale = aaa.take()
     images.append( img_whale )
 
     # if we want to be able to display some text, we will need a font
     # well, a BLFontFace to be precise
-    filename = Path("examples").joinpath("ReadexPro-Regular.ttf")   
+    filename = Path("..").joinpath("examples").joinpath("ReadexPro-Regular.ttf")   
     aaz = BLFontFace.from_path(filename,0)
     fontface = aaz.take()
 

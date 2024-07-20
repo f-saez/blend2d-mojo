@@ -105,6 +105,8 @@ alias blContextFillGlyphRunIRgba32 = fn(UnsafePointer[BLContextCore], UnsafePoin
 alias blContextFillGlyphRunD = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[BLGlyphRun]) -> BLResult
 alias blContextFillGlyphRunDRgba32 = fn(UnsafePointer[BLContextCore], UnsafePointer[BLPoint], UnsafePointer[BLFontCore], UnsafePointer[BLGlyphRun], UInt32) -> BLResult
 
+alias blContextSetGlobalAlpha = fn(UnsafePointer[BLContextCore], Float64) -> BLResult
+alias blContextGetGlobalAlpha = fn(UnsafePointer[BLContextCore]) -> Float64
 
 alias blContextSetFillStyleRgba32 = fn(UnsafePointer[BLContextCore], UInt32) -> BLResult
 alias blContextSetFillStyle = fn(UnsafePointer[BLContextCore], UnsafePointer[UInt8]) -> BLResult
@@ -140,6 +142,11 @@ alias blContextSetHint = fn(UnsafePointer[BLContextCore], UInt32, UInt32) -> BLR
 @value
 struct BLCompOp:
     var value : UInt32
+
+    @staticmethod
+    @always_inline
+    fn default() -> Self:
+        return Self.src_over()  
 
     @staticmethod
     @always_inline
@@ -438,9 +445,11 @@ struct BLContext:
         return result
 
     fn end(inout self) -> BLResult:
-        var res = self._b2d._handle.get_function[blContextEnd]("blContextEnd")(self.ptr_core())        
-        _ = self._b2d._handle.get_function[blContextDestroy]("blContextDestroy")(self.ptr_core()) 
-        self._b2d.close()
+        var res = BL_ERROR_NOT_PERMITTED
+        if not self._b2d.is_destroyed():
+            var res = self._b2d._handle.get_function[blContextEnd]("blContextEnd")(self.ptr_core())        
+            _ = self._b2d._handle.get_function[blContextDestroy]("blContextDestroy")(self.ptr_core()) 
+            self._b2d.close()
         return res       
 
     fn flush(self) -> BLResult:
@@ -708,4 +717,11 @@ struct BLContext:
     @always_inline
     fn restore_clipping(self) -> BLResult:
         return self._b2d._handle.get_function[blContextRestoreClipping]("blContextRestoreClipping")(self.ptr_core())
+    
+    @always_inline
+    fn set_global_alpha(self, alpha : Float64) -> BLResult:
+        return self._b2d._handle.get_function[blContextSetGlobalAlpha]("blContextSetGlobalAlpha")(self.ptr_core(), alpha)
 
+    @always_inline
+    fn get_global_alpha(self) -> Float64:
+        return self._b2d._handle.get_function[blContextGetGlobalAlpha]("blContextGetGlobalAlpha")(self.ptr_core())

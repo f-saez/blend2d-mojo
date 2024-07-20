@@ -57,7 +57,7 @@ def main():
                 # why keep our object, we just clear it
                 _ = path.clear()
                 # if our path if not clsed, it means that it has two "caps"
-                # meaning how is drawn the begening of our shape and how if drawn the end of our shape.
+                # meaning how is drawn the begining of our shape and how is drawn the end of our shape.
                 # think of an arrow : a triangle at the start, feathers at the end
                 # let's see what we can do
                 _ = path.move_to(119, 49)

@@ -255,6 +255,12 @@ struct BLImage:
                     print("BLImage failed with ",error_code(res))  
         return result
 
+    @staticmethod
+    fn empty_from(img : Self) -> Optional[Self]:
+        var w = img.get_width()
+        var h = img.get_width()
+        return Self.new(Int(w.value), Int(h.value), img.get_format())
+
     fn create_context(self, threadcount : UInt32) -> Optional[BLContext]:
         var stuff = BLContext.begin(self, threadcount)
         return stuff

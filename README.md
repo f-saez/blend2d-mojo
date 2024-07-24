@@ -59,4 +59,8 @@ Execute the file run_examples.sh and look at the files in examples.
 These are basic examples, with comments on how it works and how to use it.
 It should gives you a rough idea on how things works.
 
-There are 11 tutorials than show the basic usage of Blend2D and they could apply to any other 2D library
+There are 13 tutorials than show the basic usage of Blend2D and they could apply to any other 2D library
+
+note : I've run into some troubles with  some destructors called at the wrong time. I think it is related to some @value decorator on some struct 
+but haven't been able to pin precisely where. Probably a __copyinit__/__moveinit__ that happens when I don't want to and that I'm not aware of.
+For now, the memory management of Blend3D object is manual, until I found time to solve this properly.

@@ -47,7 +47,10 @@ In the future, I will use static linking to ease deployment.
 
 - and the basic stuff : draw lines, circles, rectangles, compositing (Porter & Duff operators), transparency, 
 
-Only three file formats to load and save : JPEG, PNG, QOI
+- grayscale conversion
+
+Only three file formats for loading images : JPEG, PNG, QOI
+and two file formats for saving :  PNG, QOI
 
 If you haven't heard of QOI : https://qoiformat.org/
 
@@ -59,7 +62,7 @@ Execute the file run_examples.sh and look at the files in examples.
 These are basic examples, with comments on how it works and how to use it.
 It should gives you a rough idea on how things works.
 
-There are 13 tutorials than show the basic usage of Blend2D and they could apply to any other 2D library
+There are 14 tutorials than show the basic usage of Blend2D and they could apply to any other 2D library
 
 note : I've run into some troubles with  some destructors called at the wrong time. I think it is related to some @value decorator on some struct 
 but haven't been able to pin precisely where. Probably a __copyinit__/__moveinit__ that happens when I don't want to and that I'm not aware of.

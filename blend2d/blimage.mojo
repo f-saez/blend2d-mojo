@@ -11,6 +11,9 @@ from .blcodec import BLArrayCore
 from .blcolor import BLRgba32
 from .blgeometry import BLSizeI, BLRect, BLRectI
 
+from algorithm import parallelize
+from .grayscale import Grayscale, GrayscaleLensFilter
+
 alias BL_FORMAT_NONE: UInt32   = 0
 alias BL_FORMAT_PRGB32: UInt32 = 1  # pre-multiplied alpha
 alias BL_FORMAT_XRGB32: UInt32 = 2  # alpha ignored, ie always opaque
@@ -274,6 +277,10 @@ struct BLImage:
         return (width.cast[DType.float64]()/self._ratio).roundeven().cast[DType.int32]()
 
     @always_inline
+    fn get_pixels_ptr(self) -> DTypePointer[DType.uint8,AddressSpace.GENERIC]:
+        return DTypePointer[ DType.uint8, AddressSpace.GENERIC ](self._data.pixels)
+
+    @always_inline
     fn get_width(self) -> Int32:
         return self._data.size.w
     
@@ -335,9 +342,41 @@ struct BLImage:
 
     fn make_mutable(self) -> BLResult:
         """
-            return some data on the image.
+            make the image mutable for an external processing.
         """
         return self._b2d._handle.get_function[blImageMakeMutable]("blImageMakeMutable")(self.get_core_ptr(), UnsafePointer[BLImageData](self._data))
+
+    fn grayscale(self, filter : Grayscale, num_threads : Int) -> Optional[BLImage]:
+        var stride = self.get_stride()
+        var height = self.get_height().value
+        var width = self.get_width().value
+        var result = BLImage.new(width, height, self.get_format())
+
+        if result:
+            var img_dst = result.take()
+            _ = img_dst.make_mutable()
+            var ptr_src = self.get_pixels_ptr()
+            var ptr_dst = img_dst.get_pixels_ptr()
+
+            @parameter
+            fn process_line(y : Int):	
+                var idx = y*stride			
+                for _ in range(Int(width)):
+                    var rgb_src = ptr_src.load[width=4](idx)
+                    var rgb = rgb_src.cast[DType.int32]()
+                    rgb *= filter.coef
+                    var gray = rgb.reduce_add[size_out=1]()
+                    gray = gray >> 10
+                    var g = gray.clamp(0,255).cast[DType.uint8]()
+                    var dst = SIMD[DType.uint8,4](g[0], g[0], g[0], rgb_src[3])
+                    ptr_dst.store[width=4](idx, dst)
+                    idx += 4
+            		
+            parallelize[process_line](height, num_threads )            
+            result = Optional[BLImage](img_dst)
+				
+        return result
+
 
     fn scale_to_new_image(self, size : BLSizeI, filter : BLImageScaleFilter) -> Optional[BLImage]:
         """
@@ -388,7 +427,7 @@ struct BLImage:
             # a dumb way to do that, but who cares ?
             for y in range(h):
                 var idx = y*self.get_stride()
-                for x in range(w):
+                for _ in range(w):
                     var delta = abs(data1.pixels[idx].cast[DType.int32]() - data2.pixels[idx].cast[DType.int32]())
                     if delta>=10:
                         num_diff += 1
@@ -410,7 +449,6 @@ struct BLImage:
     fn to_file(self, filename : Path, file_format : BLFileFormat) raises -> BLResult:
         var res = BL_ERROR_INVALID_HANDLE
         if not self._b2d.is_destroyed():
-            create_path_if_not_exists(filename)
             var filename1 = file_format.set_extension(filename).__str__()
             var ptr = filename1.unsafe_uint8_ptr()        
             res = self._b2d._handle.get_function[blImageWriteToFile]("blImageWriteToFile")(self.get_core_ptr(), ptr, UnsafePointer[UInt8]())
